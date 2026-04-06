@@ -7,11 +7,22 @@ class Cell{
         char biomeOfCell = NULL;
     
     public:
-        Cell(bool isSetByUser){
-            this->isSetByUser = isSetByUser;
-        };
+
+        // default construtor
+        Cell(){};
 
         
+        /**
+         * This constructor is used only if the cell is created by the user
+         * for example they chose this cell before hitting start in our ui window eventually
+         */
+        Cell(bool isSetByUser, char biomeOfCell){
+            this->isSetByUser = isSetByUser;
+            this->biomeOfCell = biomeOfCell;
+        };
+
+
+
 
 
 };
