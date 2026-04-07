@@ -19,7 +19,7 @@ class Cell{
             this->isSetByUser = isSetByUser;
             this->biomeOfCell = biomeOfCell;
             currentOptions = {{biomeOfCell, isSetByUser}};
-            numOfRemainingOptions = currentOptions.bucket_count();
+            numOfRemainingOptions = currentOptions.bucket_count(); // should be one since its predetermined
         }
         
         /**
