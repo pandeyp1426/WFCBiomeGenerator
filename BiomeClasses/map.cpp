@@ -1,36 +1,64 @@
-#include <vector>
-#include <tuple>
-#include "cell.cpp";
+#include "map.hpp"
 
-class Map{
-    private:
-        int numRows, numCols;
-        std::vector<std::vector<Cell>> mapVector;
-        std::vector<std::tuple<int, int, char>> userDefinedCells;
+/**
+ * Called only if the user defines any cells before hand
+ * creates user defined cells only if true
+ */
+void Map::initializeBoard(bool isUserInput){
+    if(isUserInput){ // creates user defined cells
+        for(std::tuple<int,int,char> curTuple : userDefinedCells){
+            mapVector.at(std::get<0>(curTuple)).at(std::get<1>(curTuple)) = new Cell(true, std::get<2>(curTuple));
+        }
+    }
 
-        /**
-         * Called only if the user defines any cells before hand
-         */
-        void initializeBoard(){
-            for(std::tuple<int, int, char> cell : userDefinedCells){
-                mapVector.at(std::get<0>(cell)).at(std::get<1>(cell)) = Cell(true, std::get<2>(cell));
+    for(int row = 0; row < numRows; row++){
+        for(int col = 0; col < numCols; col++){
+            if(mapVector.at(row).at(col)){
+                continue;
             }
+            else mapVector.at(row).at(col) = new Cell();
         }
+    }
+}
 
-    public:
-        Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char >> userDefinedCells = {{-1,-1, '0'}}){
-            this->numRows = numOfRows;
-            this->numCols = numOfCols;
-            mapVector[numRows][numCols];
+double Map::updateCellEntropy(int cellRow, int cellCol){
 
-            if(userDefinedCells
-            this->userDefinedCells = userDefinedCells;
+}
 
+
+/**
+ * Takes in size of the vector
+ * userdefined cells is optional
+ */
+Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> userDefinedCells = {{-1, -1, '0'}}){
+    this->numRows = numOfRows;
+    this->numCols = numOfCols;
+    mapVector[numRows][numCols];
+    std::tuple<int, int, char> tempTuple = userDefinedCells.at(0);
+    if(std::get<0>(tempTuple) != -1){ // checking to see if user defined any cells
+        this->userDefinedCells = userDefinedCells;
+        initializeBoard(true);
+    }
+    else initializeBoard(false);
+
+}
+
+int Map::getNumRows(){ return numRows; }
+int Map::getNumCols(){ return numCols; }
+
+Cell* Map::getCell(int rowNum, int colNum){ return mapVector.at(rowNum).at(colNum); }
+
+/**
+ * Temporary print to cmd line to test
+ * 
+ * made before we have sfml going
+ */
+void Map::printMap(){
+    for(int i = 0; i < numRows; i++){
+        for(int j = 0; j < numCols; j++){
+            std::cout << mapVector.at(i).at(j)->getBiomeOfCell();
+            if(j != numCols - 1) std::cout << " ";
         }
-
-        int getNumRows(){ return numRows; }
-        int getNumCols(){ return numCols; }
-
-        Cell getCell(int rowNum, int colNum){ return mapVector.at(rowNum).at(colNum); }
-
-};
+        std::cout << std::endl;
+    }
+}
