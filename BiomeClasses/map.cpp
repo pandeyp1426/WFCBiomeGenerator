@@ -21,8 +21,21 @@ void Map::initializeBoard(bool isUserInput){
     }
 }
 
+/**
+         * this function should update the entropy of a single cell, so it would need to be called up to 8 times
+         * when a choice is made. 
+         * --------------------------------------------------------------------
+         * | CellRow-1, cellCol-1 | CellRow-1, cellCol | cellRow-1, cellCol+1 |
+         * --------------------------------------------------------------------
+         * | CellRow  , cellcol-1 | cellrow  , cellCol | cellRow  , cellCol+1 |
+         * --------------------------------------------------------------------
+         * | CellRow+1, cellcol-1 | cellrow+1, cellCol | cellRow+1, cellCol+1 |
+         * --------------------------------------------------------------------
+         */
 double Map::updateCellEntropy(int cellRow, int cellCol){
-
+    // will become the total amount of options after checking all surrounding cells
+    int amountOfOptions = mapVector.at(cellRow).at(cellCol)->getNumberOfRemainingOptions();
+    int numSurroundingCells;
 }
 
 
