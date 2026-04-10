@@ -24,7 +24,7 @@ Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> u
 void Map::initializeBoard(bool isUserInput){
     if(isUserInput){ // creates user defined cells
         for(std::tuple<int,int,char> curTuple : userDefinedCells){
-            mapVector.at(std::get<0>(curTuple)).at(std::get<1>(curTuple)) = new Cell(true, std::get<2>(curTuple), std::get<0>(curTuple), std::get<1>(curTuple));
+            mapVector.at(std::get<0>(curTuple)).at(std::get<1>(curTuple)) = new Cell(true, std::get<2>(curTuple));
         }
     }
 
