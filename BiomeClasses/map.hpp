@@ -16,8 +16,8 @@ class Map{
         void initializeBoard(bool isUserInput);
 
         /**
-         * this function should update the entropy of a single cell, so it would need to be called up to 8 times
-         * when a choice is made. 
+         * this function should update the entropy of a single cell and all its surrounding cells
+         * it should also update the choices of the surounding cells
          * --------------------------------------------------------------------
          * | CellRow-1, cellCol-1 | CellRow-1, cellCol | cellRow-1, cellCol+1 |
          * --------------------------------------------------------------------
@@ -26,7 +26,12 @@ class Map{
          * | CellRow+1, cellcol-1 | cellrow+1, cellCol | cellRow+1, cellCol+1 |
          * --------------------------------------------------------------------
          */
-        double updateCellEntropy(int cellRow, int cellCol);
+        void updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome);
+
+        void buildSurroundingCell(int cellRow, int cellCol);
+
+
+
     
     public:
         Map(int numOfRows, int numOfCols, std::vector<std::tuple<int,int,char>> userDefinedCells = {{-1, -1, '0'}});
@@ -37,6 +42,4 @@ class Map{
         Cell* getCell(int rowNum, int colNum);
 
         void printMap();
-
-
 };
