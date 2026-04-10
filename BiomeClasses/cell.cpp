@@ -23,8 +23,7 @@ Cell::Cell(bool isSetByUser, char biomeOfCell){
  * 
  * it is able to be added back when we need to re-update the cells if we backtrack
  */
-void Cell::updateOptions(char key, bool updateBool){
-    
+void Cell::updateOptions(char key, bool updateBool){ 
     currentOptions.at(key) = updateBool;
     if(updateBool) numOfRemainingOptions++;
     else numOfRemainingOptions--;
@@ -58,3 +57,5 @@ void Cell::setBiomeOfCell(char chosenBiome) {
 double Cell::getCellEntropy() { return this->cellEntropy; }
 
 void Cell::setCellEntropy(double inputEntropy) { this->cellEntropy = inputEntropy; }
+
+std::vector<Cell*> Cell::getSurroundCellVect(){ return surroundingCells; }
