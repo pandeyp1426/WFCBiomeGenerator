@@ -4,12 +4,12 @@
  * Takes in size of the vector
  * userdefined cells is optional
  */
-Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> userDefinedCells = {{-1, -1, '\0'}}){
+Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> userDefinedCells){
     this->numRows = numOfRows;
     this->numCols = numOfCols;
-    mapVector[numRows][numCols];
-    std::tuple<int, int, char> tempTuple = userDefinedCells.at(0);
-    if(std::get<0>(tempTuple) != -1){ // checking to see if user defined any cells
+    mapVector.resize(numRows, std::vector<Cell*>(numCols, nullptr));
+
+    if(!userDefinedCells.empty()){ // checking to see if user defined any cells
         this->userDefinedCells = userDefinedCells;
         initializeBoard(true);
     }
@@ -33,7 +33,7 @@ void Map::initializeBoard(bool isUserInput){
             if(mapVector.at(row).at(col)){
                 continue;
             }
-            else mapVector.at(row).at(col) = new Cell(row, col);
+            else mapVector.at(row).at(col) = new Cell();
         }
     }
 }
