@@ -57,7 +57,7 @@ void Map::buildSurroundingCell(int cellRow, int cellCol){
     // if top edge add bottom middle cell
         // if top left corner add middle right cell and bottom right cell
         // if top right corner add middle left cell and bottom left cell
-        
+
 
 }
 
