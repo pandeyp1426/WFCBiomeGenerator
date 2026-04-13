@@ -29,7 +29,10 @@ class Map{
          */
         void updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome);
 
-        void buildSurroundingCell(int cellRow, int cellCol);
+        /**
+         * This needs to be called on every cell
+         */
+        void buildSurroundingCell(int cellRow, int cellCol, Cell* curCell);
 
 
 

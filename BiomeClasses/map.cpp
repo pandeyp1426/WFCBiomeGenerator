@@ -24,7 +24,7 @@ Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> u
 void Map::initializeBoard(bool isUserInput){
     if(isUserInput){ // creates user defined cells
         for(std::tuple<int,int,char> curTuple : userDefinedCells){
-            mapVector.at(std::get<0>(curTuple)).at(std::get<1>(curTuple)) = new Cell(true, std::get<2>(curTuple));
+            mapVector.at(std::get<0>(curTuple)).at(std::get<1>(curTuple)) = new Cell(true, std::get<2>(curTuple), std::get<0>(curTuple), std::get<1>(curTuple));
         }
     }
 
@@ -33,7 +33,7 @@ void Map::initializeBoard(bool isUserInput){
             if(mapVector.at(row).at(col)){
                 continue;
             }
-            else mapVector.at(row).at(col) = new Cell();
+            else mapVector.at(row).at(col) = new Cell(row, col);
         }
     }
 }
@@ -53,12 +53,69 @@ void Map::updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome){
     int totalChoices;
 }
 
-void Map::buildSurroundingCell(int cellRow, int cellCol){
-    // if top edge add bottom middle cell
-        // if top left corner add middle right cell and bottom right cell
-        // if top right corner add middle left cell and bottom left cell
-
-
+/**
+ * this function builds the Cell*'s surrounding cells vector, that way when we update a cells entropy and biome choice
+ * we can easily update its surrounding cells by just iterating through the cells surroundingCells Vector.
+ */
+void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
+    if(cellRow != 0 && cellRow != numRows - 1 && cellCol != 0 && cellCol != cellCol - 1){ // Cell is not an edge or corner
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
+    }
+    else if(cellRow == 0){ // cell is on top edge
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
+        if(cellCol == 0){ // top left corner
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
+        }
+        else if(cellCol == numCols - 1){ // top right corner
+            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+        }
+        else{ // just top edge
+            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
+            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+        }
+    }
+    else if(cellRow == numRows - 1){ // bottom edge
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
+        if(cellCol == 0){ // Bottom left corner
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
+        }
+        else if(cellCol == numCols-1){ // Bottom Right Corner
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
+        }
+        else{ // Just Bottom Edge
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell   
+        }
+    }
+    else if(cellCol == 0 && cellRow != 0 && cellRow != numRows - 1){ // Just Left Edge
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell 
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+    }
+    else if(cellCol != numCols - 1 && cellRow != 0 && cellRow != numRows - 1){ // Just Right Edge
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
+    }
 }
 
 int Map::getNumRows(){ return numRows; }
