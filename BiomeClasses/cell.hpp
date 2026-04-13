@@ -12,11 +12,12 @@ class Cell {
         
         // this vector will hold the surrounding cells to reduce computations so we dont have to calculate this every time
         // might need to be a 2d vector that was the might be useless
-        std::vector<Cell*> surroundingCells;
+        std::vector<std::tuple<int, int, Cell*>> surroundingCells;
+        int cellRow, cellCol; // this is the cells coordinates in the map
     
     public:
-        Cell();
-        Cell(bool isSetByUser, char biomeOfCell);
+        Cell(int cellRow, int cellCol);
+        Cell(bool isSetByUser, char biomeOfCell, int cellRow, int cellCol);
 
         void updateOptions(char key, bool updateBool);
         
@@ -27,5 +28,5 @@ class Cell {
         void setBiomeOfCell(char chosenBiome);
         double getCellEntropy();
         void setCellEntropy(double inputEntropy);
-        std::vector<Cell*> getSurroundCellVect();
+        std::vector<std::tuple<int, int, Cell*>>& getSurroundCellVect();
 };
