@@ -14,7 +14,6 @@ Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> u
         initializeBoard(true);
     }
     else initializeBoard(false);
-
 }
 
 /**
@@ -45,12 +44,10 @@ void Map::initializeBoard(bool isUserInput){
 }
 
 /**
- * this function should update the entropy of current cells entropy and choice
- * 1. getCurrentCell()
- * 2. ensure chosenBiome is viable
- * 3. 
+ * this function should update the entropy of current cells entropy and choices
 */
 void Map::updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome){
+
 }
 
 /**
