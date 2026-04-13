@@ -1,7 +1,8 @@
+#pragma once
 #include <vector>
 #include <tuple>
 #include <iostream>
-#include "cell.hpp";
+#include "cell.hpp"
 
 class Map{
     private:
@@ -28,13 +29,16 @@ class Map{
          */
         void updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome);
 
-        void buildSurroundingCell(int cellRow, int cellCol);
+        /**
+         * This needs to be called on every cell
+         */
+        void buildSurroundingCell(int cellRow, int cellCol, Cell* curCell);
 
 
 
     
     public:
-        Map(int numOfRows, int numOfCols, std::vector<std::tuple<int,int,char>> userDefinedCells = {{-1, -1, '0'}});
+        Map(int numOfRows, int numOfCols, std::vector<std::tuple<int,int,char>> userDefinedCells = {});
         
         int getNumRows();
         int getNumCols();
