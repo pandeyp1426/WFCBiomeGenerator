@@ -2,6 +2,7 @@
 #include <vector>
 #include <tuple>
 #include <iostream>
+#include <queue>
 #include "cell.hpp"
 
 class Map{
@@ -9,6 +10,8 @@ class Map{
         int numRows, numCols;
         std::vector<std::vector<Cell*>> mapVector; // Store cell pointers so I could make initialize board the way i wanted too.
         std::vector<std::tuple<int, int, char>> userDefinedCells;
+
+        std::priority_queue<std::pair<double, Cell*>> mapGenerationPQ;
 
         /**
          * Called only if the user defines any cells before hand
