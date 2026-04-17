@@ -44,7 +44,7 @@ void Map::initializeBoard(bool isUserInput){
 }
 
 /**
- * this function should update the entropy of current cells entropy and choices
+ * this function should update the entropy of current cells entropy and choices  
 */
 void Map::updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome){
 
