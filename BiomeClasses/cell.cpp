@@ -21,15 +21,16 @@ Cell::Cell(bool isSetByUser, char biomeOfCell, int inCellRow, int inCellCol){
 }
 
 /**
- * Updates the key-value pair to updateOptions
- * 
- * This is will be used when backtracking to prevent the same option from being tried again
- * and also used when we need to update surrounding cells options based on the choice we made
- * 
- * it is able to be added back when we need to re-update the cells if we backtrack
+ * adds new biome if true
+ * deletes biome if false
  */
 void Cell::updateOptions(char key, bool updateOptions){ 
-    getCurrentOptions().at(key) == updateOptions;
+    if(updateOptions){
+        getCurrentOptions().insert(key);
+    }
+    else{
+        getCurrentOptions().erase(key);
+    }
 }
 
 /**
