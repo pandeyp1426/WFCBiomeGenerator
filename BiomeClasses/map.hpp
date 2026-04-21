@@ -50,7 +50,7 @@ class Map{
 
         void printMap();
 
-        bool generateMap();
+        bool generateMap(char chosenBiome);
 
         std::priority_queue<std::pair<double, Cell*>> getPQ(){ return this->mapGenerationPQ; }
 };
