@@ -29,7 +29,7 @@ void Map::initializeBoard(bool isUserInput){
 
     for(int row = 0; row < numRows; row++){ // builds the rest of the cells with default constructro
         for(int col = 0; col < numCols; col++){
-            if(mapVector.at(row).at(col)){
+            if(mapVector.at(row).at(col)){ // this should skip any cells that the user defined
                 continue;
             }
             else mapVector.at(row).at(col) = new Cell(row, col);
@@ -122,9 +122,6 @@ void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
     }
 }
 
-int Map::getNumRows(){ return numRows; }
-int Map::getNumCols(){ return numCols; }
-
 Cell* Map::getCell(int rowNum, int colNum){ return mapVector.at(rowNum).at(colNum); }
 
 
@@ -140,5 +137,18 @@ void Map::printMap(){
             if(j != numCols - 1) std::cout << " ";
         }
         std::cout << std::endl;
+    }
+}
+
+bool Map::generateMap(){
+    Cell* topCell = mapGenerationPQ.top().second;
+    mapGenerationPQ.pop();
+
+    if(topCell->getNumberOfRemainingOptions() == 0){
+        return false;
+    }
+
+    if(topCell->getNumberOfRemainingOptions() == 1){
+        topCell->setBiomeOfCell()
     }
 }
