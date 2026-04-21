@@ -5,14 +5,17 @@
 class Cell {
     private:
         bool isSetByUser = false; // if this is true the cell cant change.
+
         std::unordered_map<char, bool> currentOptions = {{'O', true}, {'C', true}, {'P', true}}; // O = Ocean, C = Coast, P = Plains // true means its available
+        
         char biomeOfCell = '\0'; // this is the super position basically since it has no choice.
+        
         int numOfRemainingOptions = currentOptions.bucket_count(); // just the amount of options in the unordered map // can just be the entropy of our cell
+        
         double cellEntropy; // will be this [this->numOfRemainingOptions + (numOfRemainingOptions of surrounding 8 cells)] / 9
         
-        // this vector will hold the surrounding cells to reduce computations so we dont have to calculate this every time
-        // might need to be a 2d vector that was the might be useless
         std::vector<std::tuple<int, int, Cell*>> surroundingCells;
+        
         int cellRow, cellCol; // this is the cells coordinates in the map
     
     public:
@@ -21,12 +24,12 @@ class Cell {
 
         void updateOptions(char key, bool updateBool);
         
-        bool getIsSetByUser();
-        bool getCurrentOptions(char key);
-        int getNumberOfRemainingOptions();
-        char getBiomeOfCell();
-        void setBiomeOfCell(char chosenBiome);
-        double getCellEntropy();
+        bool setBiomeOfCell(char chosenBiome);
+        double getCellEntropy(){ return cellEntropy; }
         void setCellEntropy(double inputEntropy);
-        std::vector<std::tuple<int, int, Cell*>>& getSurroundCellVect();
+        std::vector<std::tuple<int, int, Cell*>>& getSurroundCellVect() { return surroundingCells; }
+        bool getIsSetByUser(){ return isSetByUser; }
+        std::unordered_map<char, bool> getCurrentOptions(){ return currentOptions; }
+        int getNumberOfRemainingOptions();
+        char getBiomeOfCell(){ return biomeOfCell; }
 };
