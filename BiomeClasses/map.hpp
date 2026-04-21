@@ -43,10 +43,14 @@ class Map{
     public:
         Map(int numOfRows, int numOfCols, std::vector<std::tuple<int,int,char>> userDefinedCells = {});
         
-        int getNumRows();
-        int getNumCols();
+        int getNumRows(){ return numRows; }
+        int getNumCols(){ return numCols; }
 
         Cell* getCell(int rowNum, int colNum);
 
         void printMap();
+
+        bool generateMap();
+
+        std::priority_queue<std::pair<double, Cell*>> getPQ(){ return this->mapGenerationPQ; }
 };
