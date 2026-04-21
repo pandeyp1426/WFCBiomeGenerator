@@ -46,11 +46,13 @@ class Map{
         int getNumRows(){ return numRows; }
         int getNumCols(){ return numCols; }
 
+        std::vector<char> biomeChoices = {'O', 'C', 'P'};
+
         Cell* getCell(int rowNum, int colNum);
 
         void printMap();
 
-        bool generateMap(char chosenBiome);
+        bool generateMap();
 
         std::priority_queue<std::pair<double, Cell*>> getPQ(){ return this->mapGenerationPQ; }
 };

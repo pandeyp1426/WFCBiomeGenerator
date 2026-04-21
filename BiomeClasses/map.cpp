@@ -140,23 +140,11 @@ void Map::printMap(){
     }
 }
 
-bool Map::generateMap(char chosenBiome){
-    Cell* topCell = mapGenerationPQ.top().second;
-    mapGenerationPQ.pop();
-
-    if(topCell->getNumberOfRemainingOptions() == 0){
-        return false;
+// run until Priority queue is emtpy
+bool Map::generateMap(){
+    while(!getPQ().empty()){
+        Cell* topCell = getPQ().top().second;
+        getPQ().pop();
+        
     }
-
-    if(topCell->getNumberOfRemainingOptions() == 1 && topCell->setBiomeOfCell(chosenBiome)){
-        topCell->setBiomeOfCell(chosenBiome);
-        // update surrounding cells vector function goes here
-        for(std::tuple<int,int,Cell*> neighborCell : topCell->getSurroundCellVect()){
-            this->getPQ().push({std::get<2>(neighborCell)->getCellEntropy(), std::get<2>(neighborCell)});
-        }
-        return true;
-    }
-    else return false;
-
-
 }
