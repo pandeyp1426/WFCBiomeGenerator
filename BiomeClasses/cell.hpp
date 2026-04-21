@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
+#include <set>
 
 class Cell {
     private:
         bool isSetByUser = false; // if this is true the cell cant change.
 
-        std::vector<char> currentOptions = {'O', 'C', 'P'}; // O = Ocean, C = Coast, P = Plains // true means its available
+        std::set<char> currentOptions = {'O', 'C', 'P'}; // O = Ocean, C = Coast, P = Plains // true means its available
         
         char biomeOfCell = '\0'; // this is the super position basically since it has no choice.
         
@@ -28,7 +29,7 @@ class Cell {
         void setCellEntropy(double inputEntropy);
         std::vector<std::tuple<int, int, Cell*>>& getSurroundCellVect() { return surroundingCells; }
         bool getIsSetByUser(){ return isSetByUser; }
-        std::vector<char> getCurrentOptions(){ return currentOptions; }
-        int getNumberOfRemainingOptions();
+        std::set<char> getCurrentOptions(){ return currentOptions; }
+        int getNumberOfRemainingOptions(){ return currentOptions.size(); }
         char getBiomeOfCell(){ return biomeOfCell; }
 };

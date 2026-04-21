@@ -37,7 +37,7 @@ void Cell::updateOptions(char key, bool updateOptions){
  * ensures its actually an option
  */
 bool Cell::setBiomeOfCell(char chosenBiome) { 
-    if(getCurrentOptions().at(chosenBiome)) {
+    if(getCurrentOptions().count(chosenBiome) == 1) {
         this->biomeOfCell = chosenBiome;
         updateOptions(chosenBiome, false); // false because this indicates it can't be chosen again and we are choosing it here
         return true;
