@@ -13,7 +13,7 @@ Cell::Cell(int inCellRow, int inCellCol){
 Cell::Cell(bool isSetByUser, char biomeOfCell, int inCellRow, int inCellCol){
     this->isSetByUser = isSetByUser;
     this->biomeOfCell = biomeOfCell;
-    currentOptions = {{biomeOfCell, isSetByUser}};
+    currentOptions = {biomeOfCell};
     numOfRemainingOptions = currentOptions.bucket_count(); // should be one since its predetermined 
     cellEntropy = 0.0; // Should be zero since it can't change since this is a user defined cell // not zero indicates its not set
     this->cellRow = inCellRow;
@@ -28,39 +28,23 @@ Cell::Cell(bool isSetByUser, char biomeOfCell, int inCellRow, int inCellCol){
  * 
  * it is able to be added back when we need to re-update the cells if we backtrack
  */
-void Cell::updateOptions(char key, bool updateBool){ 
-    currentOptions.at(key) = updateBool;
-    if(updateBool) numOfRemainingOptions++;
-    else numOfRemainingOptions--;
-
+void Cell::updateOptions(char key, bool updateOptions){ 
+    if(updateOptions){
+        
+    }
 }
 
-bool Cell::getIsSetByUser() { return isSetByUser; }
-// void setIsSetByUser(bool input) { isSetByUser = input; }
-
 /**
- * This checks the current cell to see what options it has left
- * if it returns false the option isn't available
+ * sets the biome of cell
+ * ensures its actually an option
  */
-bool Cell::getCurrentOptions(char key) { return currentOptions.at(key); }
-
-int Cell::getNumberOfRemainingOptions() { return numOfRemainingOptions; }
-
-char Cell::getBiomeOfCell() { return biomeOfCell; }
-
-/**
- * sets the biome of the cell and ensures its reflected in current options
- */
-void Cell::setBiomeOfCell(char chosenBiome) { 
-    if(getCurrentOptions(chosenBiome)) {
+bool Cell::setBiomeOfCell(char chosenBiome) { 
+    if(getCurrentOptions().at(chosenBiome)) {
         this->biomeOfCell = chosenBiome;
         updateOptions(chosenBiome, false); // false because this indicates it can't be chosen again and we are choosing it here
+        return true;
     }
-    else return; 
+    else return false; 
 }
 
-double Cell::getCellEntropy() { return this->cellEntropy; }
-
 void Cell::setCellEntropy(double inputEntropy) { this->cellEntropy = inputEntropy; }
-
-std::vector<std::tuple<int, int, Cell*>>& Cell::getSurroundCellVect(){ return surroundingCells; }
