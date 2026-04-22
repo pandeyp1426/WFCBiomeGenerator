@@ -152,7 +152,7 @@ bool Map::generateMap(){
         // update cell options and entropy function
         for(int i = 0; i < topCell->getSurroundCellVect().size(); i++){
             Cell* curCell = (std::get<2>(topCell->getSurroundCellVect().at(i)));
-            if(!curCell->getIsSetByUser() && curCell->getCellEntropy() != 0.0){ // push onto PQ if its not user defined and not already set = 0.0 entropy
+            if(!curCell->getIsSetByUser() && curCell->getCellEntropy() != 0.0 /* && validChoice() */){ // push onto PQ if its not user defined and not already set = 0.0 entropy
                 getPQ().push({curCell->getCellEntropy(), curCell});
             }
         }
