@@ -122,8 +122,6 @@ void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
     }
 }
 
-Cell* Map::getCell(int rowNum, int colNum){ return mapVector.at(rowNum).at(colNum); }
-
 
 /**
  * Temporary print to cmd line to test
@@ -145,14 +143,40 @@ bool Map::generateMap(){
     while(!getPQ().empty()){
         Cell* topCell = getPQ().top().second;
         getPQ().pop();
-        
+        char biomeChoice = getNextBiomeChoice(topCell);
+        if(biomeChoice = NULL){
+            return false;
+        }
+
+        topCell->setBiomeOfCell(biomeChoice);
+        // update cell options and entropy function
+        for(int i = 0; i < topCell->getSurroundCellVect().size(); i++){
+            Cell* curCell = (std::get<2>(topCell->getSurroundCellVect().at(i)));
+            if(!curCell->getIsSetByUser() && curCell->getCellEntropy() != 0.0){ // push onto PQ if its not user defined and not already set = 0.0 entropy
+                getPQ().push({curCell->getCellEntropy(), curCell});
+            }
+        }
     }
+
+    return true;
 }
 
+/**
+ * will return null char if the options are empty.
+ * which shouldnt happen but allows for another spot/way to check that
+ */
 char Map::getNextBiomeChoice(Cell* curCell){
+    const auto& cellBiomeOptions = curCell->getCurrentOptions();
+
+    if(cellBiomeOptions.empty()){
+        return '\0';
+    }
+
     std::random_device randomSeed;
     std::mt19937 gen(randomSeed());
     std::uniform_int_distribution<> distr(0, curCell->getNumberOfRemainingOptions() - 1);
 
-    return distr(gen);
+    auto it = cellBiomeOptions.begin();
+    std::advance(it, distr(gen));
+    return *it;
 }

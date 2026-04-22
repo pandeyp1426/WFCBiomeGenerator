@@ -57,5 +57,5 @@ class Map{
 
         char getNextBiomeChoice(Cell* curCell);
 
-        std::priority_queue<std::pair<double, Cell*>> getPQ(){ return this->mapGenerationPQ; }
+        std::priority_queue<std::pair<double, Cell*>> &getPQ(){ return this->mapGenerationPQ; }
 };
