@@ -13,7 +13,7 @@ Cell::Cell(int inCellRow, int inCellCol){
 Cell::Cell(bool isSetByUser, char biomeOfCell, int inCellRow, int inCellCol){
     this->isSetByUser = isSetByUser;
     this->biomeOfCell = biomeOfCell;
-    currentOptions = {{biomeOfCell, false}};
+    currentOptions = {biomeOfCell};
     numOfRemainingOptions = currentOptions.size(); // should be one since its predetermined 
     cellEntropy = 0.0; // Should be zero since it can't change since this is a user defined cell // not zero indicates its not set
     this->cellRow = inCellRow;
@@ -21,15 +21,19 @@ Cell::Cell(bool isSetByUser, char biomeOfCell, int inCellRow, int inCellCol){
 }
 
 /**
- * adds new biome if true
- * deletes biome if false
+ * updateOptions = true add new biome
+ * updateOptions = false remove biome
  */
 void Cell::updateOptions(char key, bool updateOptions){ 
     if(updateOptions){
-        getCurrentOptions().insert(key);
+        getCurrentOptions().push_back(key);
     }
     else{
-        getCurrentOptions().erase(key);
+        for(int i = 0; i < getNumberOfRemainingOptions(); i++){
+            if(key == getCurrentOptions().at(i)){
+                getCurrentOptions().erase(getCurrentOptions().at(i));
+            }
+        }
     }
 }
 

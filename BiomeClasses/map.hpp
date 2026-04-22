@@ -3,6 +3,7 @@
 #include <tuple>
 #include <iostream>
 #include <queue>
+#include <random>
 #include "cell.hpp"
 
 class Map{
@@ -48,11 +49,13 @@ class Map{
 
         std::vector<char> biomeChoices = {'O', 'C', 'P'};
 
-        Cell* getCell(int rowNum, int colNum);
+        Cell* getCell(int rowNum, int colNum){ return mapVector.at(rowNum).at(colNum); }
 
         void printMap();
 
         bool generateMap();
+
+        char getNextBiomeChoice(Cell* curCell);
 
         std::priority_queue<std::pair<double, Cell*>> getPQ(){ return this->mapGenerationPQ; }
 };

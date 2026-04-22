@@ -148,3 +148,11 @@ bool Map::generateMap(){
         
     }
 }
+
+char Map::getNextBiomeChoice(Cell* curCell){
+    std::random_device randomSeed;
+    std::mt19937 gen(randomSeed());
+    std::uniform_int_distribution<> distr(0, curCell->getNumberOfRemainingOptions() - 1);
+
+    return distr(gen);
+}
