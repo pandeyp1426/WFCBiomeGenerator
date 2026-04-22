@@ -29,7 +29,7 @@ class Cell {
         void setCellEntropy(double inputEntropy);
         std::vector<std::tuple<int, int, Cell*>>& getSurroundCellVect() { return surroundingCells; }
         bool getIsSetByUser(){ return isSetByUser; }
-        std::set<char> getCurrentOptions(){ return currentOptions; }
+        std::set<char>& getCurrentOptions(){ return currentOptions; }
         int getNumberOfRemainingOptions(){ return currentOptions.size(); }
         char getBiomeOfCell(){ return biomeOfCell; }
 };

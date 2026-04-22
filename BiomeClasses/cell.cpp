@@ -21,30 +21,30 @@ Cell::Cell(bool isSetByUser, char biomeOfCell, int inCellRow, int inCellCol){
 }
 
 /**
- * updateOptions = true add new biome
- * updateOptions = false remove biome
+ * @param updateOptions true = add biome to updates // false = remove biome ie. it was chosen
  */
 void Cell::updateOptions(char key, bool updateOptions){ 
     if(updateOptions){
-        getCurrentOptions().push_back(key);
+        if(getCurrentOptions().count(key) == 0){
+            getCurrentOptions().emplace(key);
+        }
+        else return;
     }
     else{
-        for(int i = 0; i < getNumberOfRemainingOptions(); i++){
-            if(key == getCurrentOptions().at(i)){
-                getCurrentOptions().erase(getCurrentOptions().at(i));
-            }
+        if(getCurrentOptions().count(key) == 1){
+            getCurrentOptions().erase(key);
         }
     }
 }
 
 /**
  * sets the biome of cell
- * ensures its actually an option
+ * returns false if it wasn't an option
  */
 bool Cell::setBiomeOfCell(char chosenBiome) { 
     if(getCurrentOptions().count(chosenBiome) == 1) {
         this->biomeOfCell = chosenBiome;
-        updateOptions(chosenBiome, false); // false because this indicates it can't be chosen again and we are choosing it here
+        updateOptions(chosenBiome, false); // false deletes the option after this 
         return true;
     }
     else return false; 
