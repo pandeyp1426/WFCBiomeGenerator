@@ -22,12 +22,12 @@ class Map{
         std::vector<std::tuple<int, int, char>> userDefinedCells;
         std::priority_queue<std::pair<double, Cell*>, std::vector<std::pair<double, Cell*>>, CompareCells> mapGenerationPQ;
         std::unordered_map<char, std::set<char>> biomeRules = {
-            {'O', {'O', 'C'}},           // Ocean can be next to Ocean/Coast
             {'C', {'C', 'D', 'O', 'P'}}, // Coast can be next to Coast/Desert/Ocean/Plains
-            {'P', {'C', 'F', 'M', 'P'}}, // Plains can be next to Coast/Forest/Mountains/Plains
+            {'D', {'C', 'D', 'M'}},      // Desert can be next to Coast/Desert/Mountains
             {'F', {'F', 'P', 'M'}},      // Forest can be next to Forest/Plains/Mountains
             {'M', {'F', 'M', 'P', 'D'}}, // Mountains can be next to Forest/Mountains/Plains/Desert
-            {'D', {'C', 'D', 'M'}}       // Desert can be next to Coast/Desert/Mountains
+            {'O', {'O', 'C'}},           // Ocean can be next to Ocean/Coast
+            {'P', {'C', 'F', 'M', 'P'}}  // Plains can be next to Coast/Forest/Mountains/Plains
         };
 
         /**
