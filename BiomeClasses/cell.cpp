@@ -12,6 +12,7 @@ Cell::Cell(int inCellRow, int inCellCol){
  */
 Cell::Cell(bool isSetByUser, char biomeOfCell, int inCellRow, int inCellCol){
     this->isSetByUser = isSetByUser;
+    this->isCellSet = isSetByUser;
     this->biomeOfCell = biomeOfCell;
     currentOptions = {biomeOfCell};
     numOfRemainingOptions = currentOptions.size(); // should be one since its predetermined 
@@ -21,30 +22,14 @@ Cell::Cell(bool isSetByUser, char biomeOfCell, int inCellRow, int inCellCol){
 }
 
 /**
- * @param updateOptions true = add biome to updates // false = remove biome ie. it was chosen
- */
-void Cell::updateOptions(char key, bool updateOptions){ 
-    if(updateOptions){
-        if(getCurrentOptions().count(key) == 0){
-            getCurrentOptions().emplace(key);
-        }
-        else return;
-    }
-    else{
-        if(getCurrentOptions().count(key) == 1){
-            getCurrentOptions().erase(key);
-        }
-    }
-}
-
-/**
  * sets the biome of cell
  * returns false if it wasn't an option
  */
 bool Cell::setBiomeOfCell(char chosenBiome) { 
     if(getCurrentOptions().count(chosenBiome) == 1) {
         this->biomeOfCell = chosenBiome;
-        updateOptions(chosenBiome, false); // false deletes the option after this 
+        this->setIsCellSet(true);
+        this->setCurrentOptions({chosenBiome});
         return true;
     }
     else return false; 
