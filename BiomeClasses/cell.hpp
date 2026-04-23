@@ -34,4 +34,5 @@ class Cell {
         char getBiomeOfCell(){ return biomeOfCell; }
         bool getIsCellSet(){ return this->isCellSet; }
         void setIsCellSet(bool isSet){ this->isCellSet = isSet; }
+        std::pair<int,int> getCoords(){ return {cellRow, cellCol}; }
 };
