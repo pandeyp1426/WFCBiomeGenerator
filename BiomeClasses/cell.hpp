@@ -32,7 +32,6 @@ class Cell {
         void setCurrentOptions(std::set<char> newBiomeOptions){ this->getCurrentOptions() = newBiomeOptions; }
         int getNumberOfRemainingOptions(){ return currentOptions.size(); }
         char getBiomeOfCell(){ return biomeOfCell; }
-        std::pair<int,int> getCellCoords(){ return {this->cellRow, this->cellCol}; }
         bool getIsCellSet(){ return this->isCellSet; }
         void setIsCellSet(bool isSet){ this->isCellSet = isSet; }
 };
