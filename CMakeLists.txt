@@ -21,7 +21,7 @@ add_executable(WFCBiomeGenerator
 target_include_directories(WFCBiomeGenerator PRIVATE
     BiomeClasses
 )
-target_compile_features(WFCBiomeGenerator PRIVATE cxx_std_23)
+target_compile_features(WFCBiomeGenerator PRIVATE cxx_std_17)
 target_link_libraries(WFCBiomeGenerator PRIVATE SFML::Graphics)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WFCBiomeGenerator)
