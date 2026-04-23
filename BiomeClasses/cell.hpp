@@ -30,6 +30,7 @@ class Cell {
         std::vector<std::tuple<int, int, Cell*>>& getSurroundCellVect() { return surroundingCells; }
         bool getIsSetByUser(){ return isSetByUser; }
         std::set<char>& getCurrentOptions(){ return currentOptions; }
+        std::set<char> setCurrentOptions(std::set<char> newBiomeOptions){ this->getCurrentOptions() = newBiomeOptions; }
         int getNumberOfRemainingOptions(){ return currentOptions.size(); }
         char getBiomeOfCell(){ return biomeOfCell; }
 };

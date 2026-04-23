@@ -44,10 +44,26 @@ void Map::initializeBoard(bool isUserInput){
 }
 
 /**
- * this function should update the entropy of current cells entropy and choices  
-*/
-void Map::updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome){
+ * This updates the surrouding cells choices based off the chosen cell.
+ */
+void Map::updateCellChoice(Cell* currentCell){
+    for(std::tuple<int, int, Cell*> curTuple : currentCell->getSurroundCellVect()){
+        Cell* currentCellPtr = std::get<2>(curTuple);
+        currentCellPtr->setCurrentOptions(getBiomeRules(currentCell->getBiomeOfCell()));
+    }
+}
 
+void Map::updateCellEntropy(Cell* currentCell){
+    for(std::tuple<int, int, Cell*> curTuple : currentCell->getSurroundCellVect()){
+        Cell* adjacentCellPtr = std::get<2>(curTuple);
+        double newCellEntropyDividend = 0.0;
+        for(std::tuple<int, int, Cell*> curTupleSuroundingTuple : adjacentCellPtr->getSurroundCellVect()){
+            Cell* surroundingAdjacentCellPtr = std::get<2>(curTupleSuroundingTuple);
+            newCellEntropyDividend += surroundingAdjacentCellPtr->getNumberOfRemainingOptions();
+        }
+
+        adjacentCellPtr->setCellEntropy(newCellEntropyDividend / adjacentCellPtr->getSurroundCellVect().size());
+    }
 }
 
 /**
