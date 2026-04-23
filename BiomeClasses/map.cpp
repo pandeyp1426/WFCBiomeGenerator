@@ -85,29 +85,27 @@ void Map::updateCellEntropy(Cell* currentCell){
 }
 
 // run until Priority queue is emtpy
-void Map::generateMap(){
-    if(getPQ().empty()){
-        std::cout << "PQ empty\n";
-        return;    
-    } 
-
-    while(!getPQ().empty()){
-        Cell* topCell = getPQ().top().second;
+std::pair<int, int> Map::generateMap(){
+    while (!getPQ().empty() && getPQ().top().second->getIsCellSet()) {
         getPQ().pop();
-        if(topCell->getIsCellSet()) continue;
-        
-        char biomeChoice = getNextBiomeChoice(topCell);
-        if(biomeChoice == '\0'){
-            std::cout << "generation failed\n";
-            return;
-        }
-
-        topCell->setBiomeOfCell(biomeChoice);
-        topCell->setCellEntropy(0.0);
-        updateCellChoice(topCell);
-        updateCellEntropy(topCell);
-        pushCellToPQ(topCell);
     }
+
+    if (getPQ().empty()) {
+        return {};
+    }
+
+    Cell* topCell = getPQ().top().second;
+    char biomeChoice = getNextBiomeChoice(topCell);
+    if (biomeChoice == '\0') {
+        return {};
+    }
+
+    topCell->setBiomeOfCell(biomeChoice);
+    topCell->setCellEntropy(0.0);
+    updateCellChoice(topCell);
+    updateCellEntropy(topCell);
+    pushCellToPQ(topCell);
+    return topCell->getCoords();
 }
 
 /**

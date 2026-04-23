@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include "cell.hpp"
 
-
 struct CompareCells{
     bool operator()(const std::pair<double, Cell*>& a,
                     const std::pair<double, Cell*>& b) const {
@@ -71,7 +70,7 @@ class Map{
 
         void printMap();
 
-        void generateMap();
+        std::pair<int,int> generateMap();
 
         char getNextBiomeChoice(Cell* curCell);
 
@@ -80,4 +79,6 @@ class Map{
         std::set<char> getBiomeRules(char chosenBiome){ return this->biomeRules.at(chosenBiome); }
 
         void pushCellToPQ(Cell* pushCell);
+
+        std::vector<std::vector<Cell*>> &getMap(){ return this->mapVector; }
 };
