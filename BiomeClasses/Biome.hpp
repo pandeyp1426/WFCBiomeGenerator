@@ -3,24 +3,24 @@
 
 enum class Biome
 {
-    Ocean,
-    Coast,
-    Plains,
-    Forest,
-    Swamp,
-    Mountains
+    C, // Coast
+    D, // Desert
+    F, // Forest
+    M, // Mountains
+    O, // Ocean
+    P, // Plains
 };
 
 inline sf::Color biomeToColor(Biome biome)
 {
     switch (biome)
     {
-    case Biome::Ocean:     return sf::Color(0, 105, 148);
-    case Biome::Coast:     return sf::Color(240, 230, 140);
-    case Biome::Plains:    return sf::Color(50, 205, 50);
-   case Biome::Forest:    return sf::Color(34, 139, 34);
-    case Biome::Swamp:     return sf::Color(47, 79, 79);
-   case Biome::Mountains: return sf::Color(128, 128, 128);
-    default:               return sf::Color::White;
+        case Biome::C:  return sf::Color(240, 230, 140);
+        case Biome::D:  return sf::Color(204, 173, 96);
+        case Biome::F:  return sf::Color(34, 139, 34);
+        case Biome::M:  return sf::Color(128, 128, 128);
+        case Biome::O:  return sf::Color(0, 105, 148);
+        case Biome::P:  return sf::Color(50, 205, 50);
+        default:        return sf::Color::White;
     }
 }
