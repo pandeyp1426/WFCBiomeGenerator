@@ -12,12 +12,12 @@ Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> u
     if(!userDefinedCells.empty()){ // checking to see if user defined any cells
         this->userDefinedCells = userDefinedCells;
         initializeBoard(true);
+        initializePriorityQueue(true);
     }
     else initializeBoard(false);
 }
 
 /**
- * Called only if the user defines any cells before hand
  * creates user defined cells only if true
  */
 void Map::initializeBoard(bool isUserInput){
@@ -32,13 +32,31 @@ void Map::initializeBoard(bool isUserInput){
             if(mapVector.at(row).at(col)){ // this should skip any cells that the user defined
                 continue;
             }
-            else mapVector.at(row).at(col) = new Cell(row, col);
+            else {
+                mapVector.at(row).at(col) = new Cell(row, col);
+            }
         }
     }
 
     for(int row = 0; row < numRows; row++){ // goes through board again after all cells are created buildingSurroundingCellsVect
         for(int col = 0; col < numCols; col++){
             buildSurroundingCell(row, col, getCell(row, col));
+        }
+    }
+
+    for(int row = 0; row < numRows; row++){
+        for(int col = 0; col < numCols; col++){
+            updateCellEntropy(mapVector.at(row).at(col));
+        }
+    }
+}
+
+void Map::initializePriorityQueue(bool hasUserDefinedCells){
+    if(hasUserDefinedCells){
+        for(std::tuple<int,int,char> currentTuple : userDefinedCells){
+            int cellRow = std::get<0>(currentTuple);
+            int cellCol = std::get<1>(currentTuple);
+            pushCellToPQ(getCell(cellRow, cellCol));
         }
     }
 }
@@ -56,13 +74,39 @@ void Map::updateCellChoice(Cell* currentCell){
 void Map::updateCellEntropy(Cell* currentCell){
     for(std::tuple<int, int, Cell*> curTuple : currentCell->getSurroundCellVect()){
         Cell* adjacentCellPtr = std::get<2>(curTuple);
+        if(adjacentCellPtr->getIsCellSet()) continue;
         double newCellEntropyDividend = 0.0;
         for(std::tuple<int, int, Cell*> curTupleSuroundingTuple : adjacentCellPtr->getSurroundCellVect()){
             Cell* surroundingAdjacentCellPtr = std::get<2>(curTupleSuroundingTuple);
             newCellEntropyDividend += surroundingAdjacentCellPtr->getNumberOfRemainingOptions();
         }
-
         adjacentCellPtr->setCellEntropy(newCellEntropyDividend / adjacentCellPtr->getSurroundCellVect().size());
+    }
+}
+
+// run until Priority queue is emtpy
+void Map::generateMap(){
+    if(getPQ().empty()){
+        std::cout << "PQ empty\n";
+        return;    
+    } 
+
+    while(!getPQ().empty()){
+        Cell* topCell = getPQ().top().second;
+        getPQ().pop();
+        if(topCell->getIsCellSet()) continue;
+        
+        char biomeChoice = getNextBiomeChoice(topCell);
+        if(biomeChoice == '\0'){
+            std::cout << "generation failed\n";
+            return;
+        }
+
+        topCell->setBiomeOfCell(biomeChoice);
+        topCell->setCellEntropy(0.0);
+        updateCellChoice(topCell);
+        updateCellEntropy(topCell);
+        pushCellToPQ(topCell);
     }
 }
 
@@ -78,11 +122,11 @@ void Map::updateCellEntropy(Cell* currentCell){
  * --------------------------------------------------------------------
  */
 void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
-    if(cellRow != 0 && cellRow != numRows - 1 && cellCol != 0 && cellCol != cellCol - 1){ // Cell is not an edge or corner
+    if(cellRow != 0 && cellRow != numRows - 1 && cellCol != 0 && cellCol != numCols - 1){ // Cell is not an edge or corner
         curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
         curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
         curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
-        curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol-1, getCell(cellRow, cellCol)}); // Middle Left Cell
         curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
         curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
         curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
@@ -96,12 +140,12 @@ void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
         }
         else if(cellCol == numCols - 1){ // top right corner
             curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol-1, getCell(cellRow, cellCol)}); // Middle Left Cell
         }
         else{ // cell is not top left or right corner
             curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
             curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol-1, getCell(cellRow, cellCol)}); // Middle Left Cell
             curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
         }
     }
@@ -112,11 +156,11 @@ void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
             curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
         }
         else if(cellCol == numCols-1){ // Bottom Right Corner
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol-1, getCell(cellRow, cellCol)}); // Middle Left Cell
             curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
         }
         else{ // cell is not bottom left or right corner
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol-1, getCell(cellRow, cellCol)}); // Middle Left Cell
             curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
             curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
             curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell   
@@ -132,7 +176,7 @@ void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
     else if(cellCol == numCols - 1 && cellRow != 0 && cellRow != numRows - 1){ // Just Right Edge
         curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
         curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
-        curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol-1, getCell(cellRow, cellCol)}); // Middle Left Cell
         curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
         curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
     }
@@ -154,27 +198,15 @@ void Map::printMap(){
     }
 }
 
-// run until Priority queue is emtpy
-bool Map::generateMap(){
-    while(!getPQ().empty()){
-        Cell* topCell = getPQ().top().second;
-        getPQ().pop();
-        char biomeChoice = getNextBiomeChoice(topCell);
-        if(biomeChoice = NULL){
-            return false;
-        }
 
-        topCell->setBiomeOfCell(biomeChoice);
-        // update cell options and entropy function
-        for(int i = 0; i < topCell->getSurroundCellVect().size(); i++){
-            Cell* curCell = (std::get<2>(topCell->getSurroundCellVect().at(i)));
-            if(!curCell->getIsSetByUser() && curCell->getCellEntropy() != 0.0){ // push onto PQ if its not user defined and not already set = 0.0 entropy
-                getPQ().push({curCell->getCellEntropy(), curCell});
-            }
+
+void Map::pushCellToPQ(Cell* pushCell){
+    for(int i = 0; i < pushCell->getSurroundCellVect().size(); i++){
+        Cell* curCell = (std::get<2>(pushCell->getSurroundCellVect().at(i)));
+        if(!curCell->getIsSetByUser() && curCell->getCellEntropy() != 0.0 && !curCell->getIsCellSet()){ // push onto PQ if its not user defined and not already set = 0.0 entropy
+            getPQ().push({curCell->getCellEntropy(), curCell});
         }
     }
-
-    return true;
 }
 
 /**
