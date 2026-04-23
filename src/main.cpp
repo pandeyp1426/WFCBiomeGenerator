@@ -1,34 +1,32 @@
-//#include <SFML/Graphics.hpp>
-#include "../BiomeClasses/map.hpp"
+#include <SFML/Graphics.hpp>
+#include "../Graphics/mapRenderer.hpp"
 
 int main()
 {
-	// sf::RenderWindow window( sf::VideoMode( { 200, 200 } ), "SFML works!" );
-	// sf::RectangleShape shape({50, 100});
-	// shape.setFillColor( sf::Color::Green );
-
-	// while ( window.isOpen() )
-	// {
-	// 	while ( const std::optional event = window.pollEvent() )
-	// 	{
-	// 		if ( event->is<sf::Event::Closed>() )
-	// 			window.close();
-	// 	}
-
-	// 	window.clear();
-	// 	window.draw( shape );
-	// 	window.display();
-	// }
-
-	std::vector<std::tuple<int,int,char>> userDefinedCellsTest = {{5, 5, 'C'}, {20, 15, 'F'}};
+	const auto mapW = 150;
+	const auto mapH = 150;
+	sf::RenderWindow window( sf::VideoMode( { mapW * 4, mapH * 4 } ), "Map Generator", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
+	std::vector<std::tuple<int, int, char>> userDefinedCellsTest = { {5, 5, 'O'}, {20, 15, 'O'}, {6,6,'O'} };
 
 
-	Map newMap(30, 20, userDefinedCellsTest);
-	std::cout << "Map object made\n";
-	newMap.printMap();
-	std::cout << "\n\n\n";
-	std::cout << "Map Generate:\n";
-	newMap.generateMap();
-	newMap.printMap();
+	MapRenderer newMap(mapW, mapH, userDefinedCellsTest);
+	std::vector<std::vector<Cell*>> newMapCells = newMap.getCellMap();
+
+	while ( window.isOpen() )
+	{
+		while ( const std::optional event = window.pollEvent() )
+		{
+			if ( event->is<sf::Event::Closed>() )
+				window.close();
+		}
+
+		for(int i = 0; i < 20; i++){
+			newMap.generateMap(window);
+		}
+		
+		window.clear();
+		newMap.initialMapDraw(window);
+		window.display();
+	}
 
 }
