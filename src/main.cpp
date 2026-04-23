@@ -20,10 +20,10 @@ int main()
 	// 	window.display();
 	// }
 
-	std::vector<std::tuple<int,int,char>> userDefinedCellsTest = {{5, 5, 'C'}};
+	std::vector<std::tuple<int,int,char>> userDefinedCellsTest = {{5, 5, 'C'}, {20, 15, 'F'}};
 
 
-	Map newMap(20, 20, userDefinedCellsTest);
+	Map newMap(30, 20, userDefinedCellsTest);
 	std::cout << "Map object made\n";
 	newMap.printMap();
 	std::cout << "\n\n\n";
