@@ -28,6 +28,7 @@ class Map{
             {'M', {'F', 'M', 'P', 'D'}}, // Mountains can be next to Forest/Mountains/Plains/Desert
             {'O', {'O', 'C'}},           // Ocean can be next to Ocean/Coast
             {'P', {'C', 'F', 'M', 'P'}}  // Plains can be next to Coast/Forest/Mountains/Plains
+            // {'B', {'B', 'F'}} // Deep forest can be next to Forest/Deep Forest
         };
 
         /**
