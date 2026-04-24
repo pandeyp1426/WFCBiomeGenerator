@@ -21,4 +21,5 @@ class MapRenderer{
         void initialMapDraw(sf::RenderWindow &window);
         std::vector<std::vector<Cell*>> &getCellMap(){ return this->mapOfCells; }
         void generateMap(sf::RenderWindow &window);
+        Map &getMap(){ return cellMap; }
 };
