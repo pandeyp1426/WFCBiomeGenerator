@@ -1,6 +1,7 @@
 #include <vector>
 #include <tuple>
 #include <iostream>
+#include <set>
 #include "cell.hpp";
 
 class Map{
