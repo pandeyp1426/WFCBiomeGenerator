@@ -11,7 +11,7 @@ int main()
 
 	
 	sf::RenderWindow window( sf::VideoMode( { mapW * cellSize + 100, mapH * cellSize + 8 } ), "Map Generator", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
-	std::vector<std::tuple<int, int, char>> userDefinedCellsTest = { {5, 5, 'O'}, {20, 15, 'O'}, {6,6,'O'} };
+	std::vector<std::tuple<int, int, char>> userDefinedCellsTest = { {5, 5, 'O'} };
 
 
 	MapRenderer newMap(mapW, mapH, userDefinedCellsTest);
