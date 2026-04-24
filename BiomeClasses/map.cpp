@@ -1,147 +1,77 @@
 #include "map.hpp"
 
-/**
- * Takes in size of the vector
- * userdefined cells is optional
- */
-Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> userDefinedCells){
-    this->numRows = numOfRows;
-    this->numCols = numOfCols;
-    mapVector.resize(numRows, std::vector<Cell*>(numCols, nullptr));
-
-    if(!userDefinedCells.empty()){ // checking to see if user defined any cells
-        this->userDefinedCells = userDefinedCells;
-        initializeBoard(true);
+namespace
+{
+    std::uint16_t makeMask(std::initializer_list<Biome> biomes)
+    {
+        std::uint16_t mask = 0;
+        for (const Biome biome : biomes)
+            mask = static_cast<std::uint16_t>(mask | biomeMask(biome));
+        return mask;
     }
-    else initializeBoard(false);
+} // namespace
 
+Map::Map(int numOfRows, int numOfCols, std::uint32_t inputSeed)
+    : numRows(numOfRows), numCols(numOfCols), rng(inputSeed), seed(inputSeed)
+{
+    initializeCells();
+    buildRules();
 }
 
-/**
- * Called only if the user defines any cells before hand
- * creates user defined cells only if true
- */
-void Map::initializeBoard(bool isUserInput){
-    if(isUserInput){ // creates user defined cells if true
-        for(std::tuple<int,int,char> curTuple : userDefinedCells){
-            mapVector.at(std::get<0>(curTuple)).at(std::get<1>(curTuple)) = new Cell(true, std::get<2>(curTuple), std::get<0>(curTuple), std::get<1>(curTuple));
-        }
-    }
-
-    for(int row = 0; row < numRows; row++){ // builds the rest of the cells with default constructro
-        for(int col = 0; col < numCols; col++){
-            if(mapVector.at(row).at(col)){
-                continue;
-            }
-            else mapVector.at(row).at(col) = new Cell(row, col);
-        }
-    }
-
-    for(int row = 0; row < numRows; row++){ // goes through board again after all cells are created buildingSurroundingCellsVect
-        for(int col = 0; col < numCols; col++){
-            buildSurroundingCell(row, col, getCell(row, col));
-        }
-    }
+void Map::initializeCells()
+{
+    cells.clear();
+    cells.reserve(static_cast<std::size_t>(numRows * numCols));
+    for (int row = 0; row < numRows; ++row)
+        for (int col = 0; col < numCols; ++col)
+            cells.emplace_back(row, col);
 }
 
-/**
- * this function should update the entropy of current cells entropy and choice
- * 1. getCurrentCell()
- * 2. ensure chosenBiome is viable
- * 3. 
-*/
-void Map::updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome){
+void Map::buildRules()
+{
+    biomeRules.assign(static_cast<std::size_t>(biomeCount()), {});
+
+    biomeRules[static_cast<int>(Biome::Ocean)].allowedNeighbors = makeMask({ Biome::Ocean, Biome::Coast });
+    biomeRules[static_cast<int>(Biome::Coast)].allowedNeighbors = makeMask({ Biome::Ocean, Biome::Coast, Biome::Beach, Biome::Plains });
+    biomeRules[static_cast<int>(Biome::Beach)].allowedNeighbors = makeMask({ Biome::Coast, Biome::Beach, Biome::Plains, Biome::Desert });
+	biomeRules[static_cast<int>(Biome::Plains)].allowedNeighbors = makeMask({ Biome::Coast, Biome::Beach, Biome::Plains, Biome::Forest, Biome::Desert });
+    biomeRules[static_cast<int>(Biome::Forest)].allowedNeighbors = makeMask({ Biome::Plains, Biome::Forest, Biome::Mountain}); 
+    biomeRules[static_cast<int>(Biome::Desert)].allowedNeighbors = makeMask({ Biome::Beach, Biome::Plains, Biome::Desert, Biome::Mountain });
+    biomeRules[static_cast<int>(Biome::Mountain)].allowedNeighbors = makeMask({ Biome::Plains, Biome::Forest, Biome::Desert, Biome::Mountain});
+}
+void Map::resetToUncollapsed()
+{
+    for (Cell& cell : cells)
+        cell.reset(fullBiomeMask());
 }
 
-/**
- * this function builds the Cell*'s surrounding cells vector, that way when we update a cells entropy and biome choice
- * we can easily update its surrounding cells by just iterating through the cells surroundingCells Vector.
- * --------------------------------------------------------------------
- * | cellRow-1, cellCol-1 | cellRow-1, cellCol | cellRow-1, cellCol+1 |
- * --------------------------------------------------------------------
- * | CellRow  , cellcol-1 | cellrow  , cellCol | cellRow  , cellCol+1 |
- * --------------------------------------------------------------------
- * | CellRow+1, cellcol-1 | cellrow+1, cellCol | cellRow+1, cellCol+1 |
- * --------------------------------------------------------------------
- */
-void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
-    if(cellRow != 0 && cellRow != numRows - 1 && cellCol != 0 && cellCol != cellCol - 1){ // Cell is not an edge or corner
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
-        curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
-        curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
-    }
-    else if(cellRow == 0){ // cell is on the top edge
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
-        if(cellCol == 0){ // top left corner
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
-            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
-        }
-        else if(cellCol == numCols - 1){ // top right corner
-            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
-        }
-        else{ // cell is not top left or right corner
-            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
-            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
-        }
-    }
-    else if(cellRow == numRows - 1){ // cell is on the bottom edge
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
-        if(cellCol == 0){ // Bottom left corner
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
-            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
-        }
-        else if(cellCol == numCols-1){ // Bottom Right Corner
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
-            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
-        }
-        else{ // cell is not bottom left or right corner
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
-            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
-            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
-            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell   
-        }
-    }
-    else if(cellCol == 0 && cellRow != 0 && cellRow != numRows - 1){ // Just Left Edge
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell 
-        curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
-    }
-    else if(cellCol == numCols - 1 && cellRow != 0 && cellRow != numRows - 1){ // Just Right Edge
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
-        curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
-    }
+void Map::paintCell(int rowNum, int colNum, Biome biome)
+{
+    if (!isInBounds(rowNum, colNum))
+        return;
+    getCell(rowNum, colNum).collapseTo(biome);
 }
 
-int Map::getNumRows(){ return numRows; }
-int Map::getNumCols(){ return numCols; }
+int Map::indexOf(int row, int col) const
+{
+    return row * numCols + col;
+}
 
-Cell* Map::getCell(int rowNum, int colNum){ return mapVector.at(rowNum).at(colNum); }
+bool Map::isInBounds(int row, int col) const
+{
+    return row >= 0 && row < numRows && col >= 0 && col < numCols;
+}
 
+int Map::getNumRows() const { return numRows; }
+int Map::getNumCols() const { return numCols; }
+std::uint32_t Map::getSeed() const { return seed; }
 
-/**
- * Temporary print to cmd line to test
- * 
- * made before we have sfml going
- */
-void Map::printMap(){
-    for(int i = 0; i < numRows; i++){
-        for(int j = 0; j < numCols; j++){
-            std::cout << mapVector.at(i).at(j)->getBiomeOfCell();
-            if(j != numCols - 1) std::cout << " ";
-        }
-        std::cout << std::endl;
-    }
+Cell& Map::getCell(int rowNum, int colNum)
+{
+    return cells.at(static_cast<std::size_t>(indexOf(rowNum, colNum)));
+}
+
+const Cell& Map::getCell(int rowNum, int colNum) const
+{
+    return cells.at(static_cast<std::size_t>(indexOf(rowNum, colNum)));
 }

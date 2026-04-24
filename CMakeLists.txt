@@ -16,10 +16,13 @@ add_executable(WFCBiomeGenerator
     src/main.cpp
     BiomeClasses/cell.cpp
     BiomeClasses/map.cpp
- "Graphics/renderer.cpp")
+    Graphics/renderer.cpp)
+
 target_include_directories(WFCBiomeGenerator PRIVATE
     BiomeClasses
+    Graphics
 )
+
 target_compile_features(WFCBiomeGenerator PRIVATE cxx_std_17)
 target_link_libraries(WFCBiomeGenerator PRIVATE SFML::Graphics)
 

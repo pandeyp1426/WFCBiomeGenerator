@@ -1,49 +1,43 @@
 #pragma once
-#include <vector>
+
+#include <cstdint>
+#include <random>
 #include <tuple>
-#include <iostream>
+#include <vector>
+
 #include "cell.hpp"
+#include "BiomeDFA.hpp"
 
-class Map{
-    private:
-        int numRows, numCols;
-        std::vector<std::vector<Cell*>> mapVector; // Store cell pointers so I could make initialize board the way i wanted too.
-        std::vector<std::tuple<int, int, char>> userDefinedCells;
+class Map
+{
+private:
+    using BiomeRule = BiomeDFA::BiomeRule;
 
-        /**
-         * Called only if the user defines any cells before hand
-         * creates user defined cells only if true
-         */
-        void initializeBoard(bool isUserInput);
+    int numRows = 0;
+    int numCols = 0;
+    std::vector<Cell> cells;
+    std::vector<BiomeRule> biomeRules;
+    std::mt19937 rng;
+    std::uint32_t seed = 0;
 
-        /**
-         * this function should update the entropy of a single cell and all its surrounding cells
-         * it should also update the choices of the surounding cells
-         * --------------------------------------------------------------------
-         * | CellRow-1, cellCol-1 | CellRow-1, cellCol | cellRow-1, cellCol+1 |
-         * --------------------------------------------------------------------
-         * | CellRow  , cellcol-1 | cellrow  , cellCol | cellRow  , cellCol+1 |
-         * --------------------------------------------------------------------
-         * | CellRow+1, cellcol-1 | cellrow+1, cellCol | cellRow+1, cellCol+1 |
-         * --------------------------------------------------------------------
-         */
-        void updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome);
+    void initializeCells();
+    void buildRules();
+    int indexOf(int row, int col) const;
 
-        /**
-         * This needs to be called on every cell
-         */
-        void buildSurroundingCell(int cellRow, int cellCol, Cell* curCell);
+public:
+    Map(int numOfRows, int numOfCols, std::uint32_t seed = 1337u);
 
+    int getNumRows() const;
+    int getNumCols() const;
+    std::uint32_t getSeed() const;
 
+    bool isInBounds(int row, int col) const;
 
-    
-    public:
-        Map(int numOfRows, int numOfCols, std::vector<std::tuple<int,int,char>> userDefinedCells = {});
-        
-        int getNumRows();
-        int getNumCols();
+    Cell& getCell(int rowNum, int colNum);
+    const Cell& getCell(int rowNum, int colNum) const;
 
-        Cell* getCell(int rowNum, int colNum);
+    const std::vector<BiomeRule>& getBiomeRules() const { return biomeRules; }
 
-        void printMap();
+    void paintCell(int rowNum, int colNum, Biome biome);
+    void resetToUncollapsed();
 };
