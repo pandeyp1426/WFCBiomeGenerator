@@ -68,6 +68,20 @@ void Map::updateCellChoice(Cell* currentCell){
     for(std::tuple<int, int, Cell*> curTuple : currentCell->getSurroundCellVect()){
         Cell* currentCellPtr = std::get<2>(curTuple);
         currentCellPtr->setCurrentOptions(getBiomeRules(currentCell->getBiomeOfCell()));
+
+        // if(currentCellPtr->getIsCellSet()) continue;
+        // std::set<char> currentSet = currentCellPtr->getCurrentOptions();
+        // std::set<char> newBiomeOptions = getBiomeRules(currentCell->getBiomeOfCell());
+
+        // std::set<char> intersectedBiomes;
+
+        // std::set_intersection(
+        //     currentSet.begin(), currentSet.end(), 
+        //     newBiomeOptions.begin(), newBiomeOptions.end(),
+        //     std::inserter(intersectedBiomes, intersectedBiomes.begin())
+        // );
+
+        // currentCellPtr->setCurrentOptions(intersectedBiomes);
     }
 }
 
@@ -124,7 +138,7 @@ void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
         curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
         curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
         curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
-        curCell->getSurroundCellVect().push_back({cellRow, cellCol-1, getCell(cellRow, cellCol)}); // Middle Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol-1, getCell(cellRow, cellCol-1)}); // Middle Left Cell
         curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
         curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
         curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
