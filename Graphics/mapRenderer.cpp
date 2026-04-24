@@ -18,7 +18,7 @@ void MapRenderer::buildDisplayMap(){
 
             sf::RectangleShape newRect;
             newRect.setSize(sf::Vector2f(cellSize,cellSize));
-            newRect.setPosition({static_cast<float>(row + 5) * cellSize, static_cast<float>(col + 5) * cellSize});
+            newRect.setPosition({static_cast<float>(row) * cellSize, static_cast<float>(col) * cellSize});
             newRect.setFillColor(biomeToColor(curCell->getBiomeOfCell()));
             displayMap.at(row).at(col) = newRect;
         }
