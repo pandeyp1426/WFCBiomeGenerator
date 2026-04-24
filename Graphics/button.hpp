@@ -1,5 +1,6 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics.hpp>
+#include <string>
 
 class Button{
     private:
