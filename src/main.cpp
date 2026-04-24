@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "../Graphics/mapRenderer.hpp"
+#include "../Graphics/button.hpp"
 
 int main()
 {
@@ -12,6 +13,8 @@ int main()
 
 	MapRenderer newMap(mapW, mapH, userDefinedCellsTest);
 	std::vector<std::vector<Cell*>> newMapCells = newMap.getCellMap();
+
+	Button generateButton(40, 20, "Generate Map", static_cast<float>(mapW - 20), static_cast<float>(mapH - 20), sf::Color::Green)
 
 	while ( window.isOpen() )
 	{
