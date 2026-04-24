@@ -3,10 +3,12 @@
 
 int main()
 {
-	const auto mapW = 500;
-	const auto mapH = 300;
+	const auto mapW = 200;
+	const auto mapH = 200;
 	sf::RenderWindow window( sf::VideoMode( { mapW * 4, mapH * 4 } ), "Map Generator", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
-	std::vector<std::tuple<int, int, char>> userDefinedCellsTest = { {250, 150, 'O'}, {251, 150, 'O'}, {252,150,'O'} };
+	std::vector<std::tuple<int, int, char>> userDefinedCellsTest = { 
+		{75,75,'I'},{75,76,'I'},{75,77,'I'},
+	 	{74,75,'I'},{74,76,'I'},{74,77,'I'}};
 
 
 	MapRenderer newMap(mapW, mapH, userDefinedCellsTest);
