@@ -5,7 +5,12 @@ int main()
 {
 	const auto mapW = 100;
 	const auto mapH = 100;
-	sf::RenderWindow window( sf::VideoMode( { mapW * 4 + 100, mapH * 4 + 8 } ), "Map Generator", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
+	const int cellSize = 4;
+	int windowWidth = mapW * 4 + 100;
+	int windowHeight = mapH * 4 + 8;
+
+	
+	sf::RenderWindow window( sf::VideoMode( { mapW * cellSize + 100, mapH * cellSize + 8 } ), "Map Generator", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
 	std::vector<std::tuple<int, int, char>> userDefinedCellsTest = { {5, 5, 'O'}, {20, 15, 'O'}, {6,6,'O'} };
 
 
