@@ -7,6 +7,9 @@ MapRenderer::MapRenderer(int numRows, int numCols, std::vector<std::tuple<int,in
 cellMap(numRows, numCols, userDefinedCells){
     this->mapOfCells = cellMap.getMap();
     buildDisplayMap();
+    this->numRows = numRows;
+    this->numCols = numCols;
+    buildBorderRect();
 }
 
 void MapRenderer::buildDisplayMap(){
@@ -18,7 +21,7 @@ void MapRenderer::buildDisplayMap(){
 
             sf::RectangleShape newRect;
             newRect.setSize(sf::Vector2f(cellSize,cellSize));
-            newRect.setPosition({static_cast<float>(row) * cellSize, static_cast<float>(col) * cellSize});
+            newRect.setPosition({static_cast<float>(row) * cellSize + 4, static_cast<float>(col) * cellSize + 4});
             newRect.setFillColor(biomeToColor(curCell->getBiomeOfCell()));
             displayMap.at(row).at(col) = newRect;
         }
@@ -29,6 +32,7 @@ void MapRenderer::updateDisplayMap(int row, int col, sf::RenderWindow &window){
     Cell* curCell = cellMap.getCell(row, col);
     displayMap.at(row).at(col).setFillColor(biomeToColor(curCell->getBiomeOfCell()));
     window.draw(displayMap.at(row).at(col));
+    window.draw(borderRectangle);
 }
 
 void MapRenderer::initialMapDraw(sf::RenderWindow &window){
@@ -37,9 +41,18 @@ void MapRenderer::initialMapDraw(sf::RenderWindow &window){
             window.draw(displayMap.at(row).at(col));
         }
     }
+    window.draw(borderRectangle);
 }
 
 void MapRenderer::generateMap(sf::RenderWindow &window){
     std::pair<int, int> curCoords = cellMap.generateMap();
     updateDisplayMap(curCoords.first, curCoords.second, window);
+}
+
+void MapRenderer::buildBorderRect(){
+    this->borderRectangle.setSize(sf::Vector2f(numRows * 4, numCols * cellSize));
+    this->borderRectangle.setOutlineColor(sf::Color::Black);
+    this->borderRectangle.setOutlineThickness(4);
+    this->borderRectangle.setFillColor(sf::Color::Transparent);
+    this->borderRectangle.setPosition(sf::Vector2f(4, 4));
 }

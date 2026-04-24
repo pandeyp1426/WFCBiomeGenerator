@@ -15,8 +15,7 @@ FetchContent_MakeAvailable(SFML)
 add_executable(WFCBiomeGenerator
     src/main.cpp
     BiomeClasses/cell.cpp
-    BiomeClasses/map.cpp
-    Graphics/renderer.cpp 
+    BiomeClasses/map.cpp 
     BiomeClasses/Biome.cpp
     Graphics/mapRenderer.hpp
     Graphics/mapRenderer.cpp

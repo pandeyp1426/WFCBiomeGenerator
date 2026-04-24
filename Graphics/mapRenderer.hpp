@@ -9,10 +9,14 @@ class Cell;
 class MapRenderer{
     private:
         std::vector<std::vector<sf::RectangleShape>> displayMap;
+        sf::RectangleShape borderRectangle;
         Map cellMap;
         std::vector<std::vector<Cell*>> mapOfCells;
         sf::RenderWindow currentWindow;
         int cellSize = 4;
+        int numRows, numCols;
+
+        void buildBorderRect();
         
         public:
         MapRenderer(int numRows, int numCols, std::vector<std::tuple<int,int,char>> userDefinedCells = {});

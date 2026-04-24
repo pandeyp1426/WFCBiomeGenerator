@@ -5,7 +5,7 @@ int main()
 {
 	const auto mapW = 100;
 	const auto mapH = 100;
-	sf::RenderWindow window( sf::VideoMode( { mapW * 4, mapH * 4 } ), "Map Generator", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
+	sf::RenderWindow window( sf::VideoMode( { mapW * 4 + 100, mapH * 4 + 8 } ), "Map Generator", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
 	std::vector<std::tuple<int, int, char>> userDefinedCellsTest = { {5, 5, 'O'}, {20, 15, 'O'}, {6,6,'O'} };
 
 
@@ -24,7 +24,7 @@ int main()
 			newMap.generateMap(window);
 		}
 		
-		window.clear();
+		window.clear(sf::Color(173, 156, 154));
 		newMap.initialMapDraw(window);
 		window.display();
 	}
