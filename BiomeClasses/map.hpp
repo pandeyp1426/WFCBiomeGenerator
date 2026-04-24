@@ -15,6 +15,17 @@ class Map{
          */
         void initializeBoard(bool isUserInput);
 
+        std::unordered_map<char, std::set<char>> biomeRules = {
+            {'C', {'C', 'D', 'O', 'P'}}, // Coast can be next to Coast/Desert/Ocean/Plains
+            {'D', {'C', 'D', 'M'}},      // Desert can be next to Coast/Desert/Mountains
+            {'F', {'F', 'P', 'M', 'I'}}, // Forest can be next to Forest/Plains/Mountains
+            {'M', {'F', 'M', 'P', 'D'}}, // Mountains can be next to Forest/Mountains/Plains/Desert
+            {'O', {'O', 'C', 'S'}},      // Ocean can be next to Ocean/Coast
+            {'P', {'C', 'F', 'M', 'P'}}, // Plains can be next to Coast/Forest/Mountains/Plains
+            {'I', {'I', 'F'}},           // Deep forest can be next to Forest/Deep Forest
+            {'S', {'O', 'S'}}            // Deep Ocean can be next to Ocean/Deep Ocean
+        };
+
         /**
          * this function should update the entropy of a single cell, so it would need to be called up to 8 times
          * when a choice is made. 
