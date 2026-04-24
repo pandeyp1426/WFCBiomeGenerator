@@ -7,7 +7,7 @@ class Cell {
         bool isSetByUser = false; // if this is true the cell cant change.
         bool isCellSet = false;
 
-        std::set<char> currentOptions = {'C', 'D', 'F', 'M', 'O', 'P'}; // O = Ocean, C = Coast, P = Plains // true means its available
+        std::set<char> currentOptions = {'C', 'D', 'F', 'M', 'O', 'P', 'I', 'S'}; // O = Ocean, C = Coast, P = Plains // true means its available
         
         char biomeOfCell = '\0'; // this is the super position basically since it has no choice.
         
