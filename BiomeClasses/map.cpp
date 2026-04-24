@@ -32,10 +32,76 @@ void Map::initializeBoard(bool isUserInput){
          * | CellRow+1, cellcol-1 | cellrow+1, cellCol | cellRow+1, cellCol+1 |
          * --------------------------------------------------------------------
          */
-double Map::updateCellEntropy(int cellRow, int cellCol){
+
+double Map::cellOptions(int cellRow, int cellCol, Cell) {
+	int amountOfOptions = 0;
+
+    for (int row = cellRow - 1; row <= cellRow + 1; row++) {
+        if (row >= 0 && row < numRows) {
+            for (int col = cellCol - 1; col <= cellCol + 1; col++) {
+                if (col >= 0 && col < numCols) {
+                    if (mapVector.at(row).at(col)->getBiomeOfCell() != NULL) {
+                        continue;
+                    }
+                    else {
+                        char surroundingBiome = mapVector.at(row).at(col)->getBiomeOfCell();
+                        std::vector<char> validOptions = mapRules[surroundingBiome];
+                        for (char option : validOptions) {
+                            if (mapVector.at(cellRow).at(cellCol)->getCurrentOptions(option)) {
+                                amountOfOptions++;
+                            }
+						}
+					}
+                }
+            }
+        }
+    }
+    return amountOfOptions;
+}
+
+double Map::updateCellEntropy(int cellRow, int cellCol, int amountOfOptions) {
     // will become the total amount of options after checking all surrounding cells
     int amountOfOptions = mapVector.at(cellRow).at(cellCol)->getNumberOfRemainingOptions();
     int numSurroundingCells;
+
+    std::unordered_map<char, std::set<char>> mapRules = {
+        {'G', {'G', 'S'}},
+        {'W', {'W', 'S'}},
+        { 'S', {'G', 'W', 'S'}}
+    };
+
+    if (mapVector.at(cellRow).at(cellCol)->getBiomeOfCell() == 'G') {
+		char currentBiome = mapRules.find('G');
+    }
+    else if (mapVector.at(cellRow).at(cellCol)->getBiomeOfCell() == 'W') {
+        char currentBiome = mapRules.find('W');
+    } 
+    else if (mapVector.at(cellRow).at(cellCol)->getBiomeOfCell() == 'S') {
+        char currentBiome = mapRules.find('S');
+    }
+
+    for (int row = cellRow - 1; row <= cellRow + 1; row++) {
+        if (row >= 0 && row < numRows) {
+            for (int col = cellCol - 1; col <= cellCol + 1; col++) {
+                if (col >= 0 && col < numCols) {
+                    if (mapVector.at(row).at(col)->getBiomeOfCell() != NULL) {
+                        continue;
+                    }
+                    else if(currentBiome == 'G') {
+						mapVector.at(cellRow).at(cellCol)->updateOptions('W', false);
+                        amountOfOptions--;
+                    }
+                    else if(currentBiome == 'W') {
+                        mapVector.at(cellRow).at(cellCol)->updateOptions('G', false);
+                        amountOfOptions--;
+                    }
+                    else if(currentBiome == 'S') {
+                        continue;
+                    }
+                }
+            }
+        }
+    }
 }
 
 
