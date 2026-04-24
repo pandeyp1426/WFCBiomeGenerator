@@ -6,9 +6,8 @@ int main()
 	const auto mapW = 200;
 	const auto mapH = 200;
 	sf::RenderWindow window( sf::VideoMode( { mapW * 4, mapH * 4 } ), "Map Generator", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
-	std::vector<std::tuple<int, int, char>> userDefinedCellsTest = { 
-		{75,75,'I'},{75,76,'I'},{75,77,'I'},
-	 	{74,75,'I'},{74,76,'I'},{74,77,'I'}};
+	std::vector<std::tuple<int, int, char>> userDefinedCellsTest = {
+		{100,100,'P'} };
 
 
 	MapRenderer newMap(mapW, mapH, userDefinedCellsTest);
