@@ -10,28 +10,26 @@ int main()
     constexpr int   mapRows = 48;
     constexpr int   mapCols = 48;
     constexpr float tileSize = 16.0f;
+    constexpr int   stepsPerFrame = 20; // lower = slower, higher = faster
 
     const auto windowWidth = static_cast<unsigned int>(static_cast<float>(mapCols) * tileSize);
     const auto windowHeight = static_cast<unsigned int>(static_cast<float>(mapRows) * tileSize);
 
     Map map(mapRows, mapCols);
-    map.generate();
+    map.startGeneration();
+    bool generating = true;
 
     Renderer renderer(tileSize);
     sf::RenderWindow window(
         sf::VideoMode({ windowWidth, windowHeight }),
-        "WFC Biome Generator | attempts " +
-        std::to_string(map.getGenerationAttempts()) +
-        " | Space/R to regenerate");
+        "WFC Biome Generator | Space/R to regenerate");
     window.setFramerateLimit(60);
 
-    const auto regenerate = [&]()
+    const auto restart = [&]()
         {
-            map.generate();
-            window.setTitle(
-                "WFC Biome Generator | attempts " +
-                std::to_string(map.getGenerationAttempts()) +
-                " | Space/R to regenerate");
+            map.startGeneration();
+            generating = true;
+            window.setTitle("WFC Biome Generator | Space/R to regenerate");
         };
 
     while (window.isOpen())
@@ -55,10 +53,24 @@ int main()
                 break;
             case sf::Keyboard::Key::Space:
             case sf::Keyboard::Key::R:
-                regenerate();
+                restart();
                 break;
             default:
                 break;
+            }
+        }
+
+        // Collapse stepsPerFrame cells per frame so generation is visible
+        if (generating)
+        {
+            for (int i = 0; i < stepsPerFrame; ++i)
+            {
+                if (!map.generateStep())
+                {
+                    generating = false;
+                    window.setTitle("WFC Biome Generator | Done | Space/R to regenerate");
+                    break;
+                }
             }
         }
 

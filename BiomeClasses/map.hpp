@@ -18,7 +18,7 @@ private:
     using EntropyQueue = std::priority_queue<
         std::pair<float, int>,
         std::vector<std::pair<float, int>>,
-        std::greater<std::pair<float, int>>>;
+        std::greater<std::pair<float, int>> > ;
 
     int numRows = 0;
     int numCols = 0;
@@ -55,4 +55,6 @@ public:
     const Cell& getCell(int rowNum, int colNum) const;
 
     void generate(int maxAttempts = 32);
+    void startGeneration();
+    bool generateStep();
 };

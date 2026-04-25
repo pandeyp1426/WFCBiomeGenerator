@@ -66,6 +66,37 @@ void Map::pushEntropy(int cellIndex, float entropy)
     entropyQueue.push({ entropy, cellIndex });
 }
 
+void Map::startGeneration()
+{
+    rng.seed(std::random_device{}());
+    resetToUncollapsed();
+    resetEntropyQueue();
+
+    for (int index = 0; index < static_cast<int>(cells.size()); ++index)
+    {
+        Cell& cell = cells[static_cast<std::size_t>(index)];
+        const float entropy = computeEntropy(cell);
+        cell.setCellEntropy(entropy);
+        pushEntropy(index, entropy);
+    }
+}
+
+bool Map::generateStep()
+{
+    const int nextCellIndex = findLowestEntropyCell();
+    if (nextCellIndex < 0)
+        return false; // all cells collapsed, done
+
+    Cell& cell = cells[static_cast<std::size_t>(nextCellIndex)];
+    cell.collapseTo(chooseRandomBiome(cell));
+
+    std::queue<int> propagationQueue;
+    propagationQueue.push(nextCellIndex);
+    propagate(propagationQueue);
+
+    return true; // still more cells to collapse
+}
+
 bool Map::tryCollapseMap()
 {
     resetEntropyQueue();
@@ -135,6 +166,7 @@ bool Map::reduceNeighborOptions(int sourceIndex, int neighborIndex)
     const Cell& sourceCell = cells[static_cast<std::size_t>(sourceIndex)];
     Cell& neighborCell = cells[static_cast<std::size_t>(neighborIndex)];
 
+    // DFA transition: get all biomes allowed next to source's possible biomes
     const std::uint16_t allowedMask =
         BiomeDFA::allowedNeighborMask(sourceCell.getPossibleMask(), biomeRules);
 
@@ -222,9 +254,9 @@ bool Map::isInBounds(int row, int col) const
     return row >= 0 && row < numRows && col >= 0 && col < numCols;
 }
 
-int Map::getNumRows()            const { return numRows; }
-int Map::getNumCols()            const { return numCols; }
-int Map::getGenerationAttempts() const { return generationAttempts; }
+int  Map::getNumRows()            const { return numRows; }
+int  Map::getNumCols()            const { return numCols; }
+int  Map::getGenerationAttempts() const { return generationAttempts; }
 
 Cell& Map::getCell(int rowNum, int colNum)
 {

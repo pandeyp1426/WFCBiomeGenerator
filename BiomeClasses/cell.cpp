@@ -45,10 +45,10 @@ void Cell::collapseTo(Biome biome)
     cachedEntropy = 0.0f;
 }
 
-bool Cell::isCollapsed() const { return collapsed; }
-int  Cell::getRow()      const { return cellRow; }
-int  Cell::getCol()      const { return cellCol; }
-Biome Cell::getBiome()   const { return collapsedBiome; }
+bool  Cell::isCollapsed() const { return collapsed; }
+int   Cell::getRow()      const { return cellRow; }
+int   Cell::getCol()      const { return cellCol; }
+Biome Cell::getBiome()    const { return collapsedBiome; }
 
 std::uint16_t Cell::getPossibleMask() const { return possibleMask; }
 
