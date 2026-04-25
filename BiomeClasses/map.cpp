@@ -13,7 +13,15 @@ namespace
             mask = static_cast<std::uint16_t>(mask | biomeMask(biome));
         return mask;
     }
-    else initializeBoard(false);
+} // namespace
+
+Map::Map(int numOfRows, int numOfCols)
+    : numRows(numOfRows), numCols(numOfCols)
+{
+    std::random_device rd;
+    rng.seed(rd());
+    initializeCells();
+    buildRules();
 }
 
 void Map::initializeCells()
@@ -73,34 +81,35 @@ void Map::startGeneration()
     }
 }
 
-/**
- * this function should update the entropy of current cells entropy and choices
-*/
-void Map::updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome){
+bool Map::generateStep()
+{
+    const int nextCellIndex = findLowestEntropyCell();
+    if (nextCellIndex < 0)
+        return false; // all cells collapsed, done
 
+    Cell& cell = cells[static_cast<std::size_t>(nextCellIndex)];
+    cell.collapseTo(chooseRandomBiome(cell));
+
+    std::queue<int> propagationQueue;
+    propagationQueue.push(nextCellIndex);
+    propagate(propagationQueue);
+
+    return true; // still more cells to collapse
 }
 
-/**
- * this function builds the Cell*'s surrounding cells vector, that way when we update a cells entropy and biome choice
- * we can easily update its surrounding cells by just iterating through the cells surroundingCells Vector.
- * --------------------------------------------------------------------
- * | cellRow-1, cellCol-1 | cellRow-1, cellCol | cellRow-1, cellCol+1 |
- * --------------------------------------------------------------------
- * | CellRow  , cellcol-1 | cellrow  , cellCol | cellRow  , cellCol+1 |
- * --------------------------------------------------------------------
- * | CellRow+1, cellcol-1 | cellrow+1, cellCol | cellRow+1, cellCol+1 |
- * --------------------------------------------------------------------
- */
-void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
-    if(cellRow != 0 && cellRow != numRows - 1 && cellCol != 0 && cellCol != cellCol - 1){ // Cell is not an edge or corner
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
-        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
-        curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
-        curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
-        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
+bool Map::tryCollapseMap()
+{
+    resetEntropyQueue();
+
+    for (int index = 0; index < static_cast<int>(cells.size()); ++index)
+    {
+        Cell& cell = cells[static_cast<std::size_t>(index)];
+        if (cell.getNumberOfRemainingOptions() == 0)
+            return false;
+
+        const float entropy = computeEntropy(cell);
+        cell.setCellEntropy(entropy);
+        pushEntropy(index, entropy);
     }
 
     while (true)
