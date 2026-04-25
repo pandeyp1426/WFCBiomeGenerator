@@ -16,7 +16,7 @@ add_executable(WFCBiomeGenerator
     src/main.cpp
     BiomeClasses/cell.cpp
     BiomeClasses/map.cpp
-    Graphics/renderer.cpp 
+    Graphics/mapRenderer.cpp 
     BiomeClasses/Biome.cpp)
 target_include_directories(WFCBiomeGenerator PRIVATE
     BiomeClasses
