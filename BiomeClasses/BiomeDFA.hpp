@@ -18,7 +18,8 @@ public:
         const int index = static_cast<int>(currentState);
         if (index < 0 || index >= static_cast<int>(rules.size()))
             return false;
-        return (rules[static_cast<std::size_t>(index)].allowedNeighbors & biomeMask(input)) != 0;
+        return (rules[static_cast<std::size_t>(index)].allowedNeighbors
+            & biomeMask(input)) != 0;
     }
 
     // Returns bitmask of all biomes allowed next to any biome in sourceMask
@@ -36,7 +37,7 @@ public:
         return allowed;
     }
 
-    // Accepts a linear sequence — true if every adjacent pair is a valid transition
+    // Accepts a linear sequence — true if every adjacent pair is valid
     static bool accepts(const std::vector<Biome>& sequence,
         const std::vector<BiomeRule>& rules)
     {

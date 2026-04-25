@@ -4,11 +4,13 @@
 
 enum class Biome : std::uint8_t
 {
-    Ocean = 0,
+    DeepOcean = 0,
+    Ocean,
     Coast,
     Beach,
     Plains,
     Forest,
+    DeepForest,
     Desert,
     Mountain,
     Snow,
@@ -20,7 +22,6 @@ class Cell
 private:
     int cellRow = 0;
     int cellCol = 0;
-    bool locked = false;
     bool collapsed = false;
     Biome collapsedBiome = Biome::Ocean;
     std::uint16_t possibleMask = 0;
@@ -31,10 +32,8 @@ public:
     Cell(int cellRow, int cellCol);
 
     void reset(std::uint16_t fullMask);
-    void lockTo(Biome biome);
     void collapseTo(Biome biome);
 
-    bool isLocked() const;
     bool isCollapsed() const;
     int getRow() const;
     int getCol() const;
@@ -46,7 +45,6 @@ public:
 
     void setCellEntropy(float entropy);
     float getCellEntropy() const;
-
 };
 
 constexpr int biomeCount()
@@ -60,6 +58,3 @@ constexpr std::uint16_t fullBiomeMask()
 }
 
 std::uint16_t biomeMask(Biome biome);
-char biomeToSymbol(Biome biome);
-Biome biomeFromSymbol(char symbol);
-const char* biomeName(Biome biome);
