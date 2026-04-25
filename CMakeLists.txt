@@ -20,7 +20,9 @@ add_executable(WFCBiomeGenerator
     BiomeClasses/Biome.cpp)
 target_include_directories(WFCBiomeGenerator PRIVATE
     BiomeClasses
+    Graphics
 )
+
 target_compile_features(WFCBiomeGenerator PRIVATE cxx_std_17)
 target_link_libraries(WFCBiomeGenerator PRIVATE SFML::Graphics)
 

@@ -1,49 +1,60 @@
 #pragma once
+
+#include <cstdint>
+#include <functional>
+#include <queue>
+#include <random>
+#include <utility>
 #include <vector>
-#include <tuple>
-#include <iostream>
+
 #include "cell.hpp"
+#include "BiomeDFA.hpp"
 
-class Map{
-    private:
-        int numRows, numCols;
-        std::vector<std::vector<Cell*>> mapVector; // Store cell pointers so I could make initialize board the way i wanted too.
-        std::vector<std::tuple<int, int, char>> userDefinedCells;
+class Map
+{
+private:
+    using BiomeRule = BiomeDFA::BiomeRule;
 
-        /**
-         * Called only if the user defines any cells before hand
-         * creates user defined cells only if true
-         */
-        void initializeBoard(bool isUserInput);
+    using EntropyQueue = std::priority_queue<
+        std::pair<float, int>,
+        std::vector<std::pair<float, int>>,
+        std::greater<std::pair<float, int>> > ;
 
-        /**
-         * this function should update the entropy of a single cell and all its surrounding cells
-         * it should also update the choices of the surounding cells
-         * --------------------------------------------------------------------
-         * | CellRow-1, cellCol-1 | CellRow-1, cellCol | cellRow-1, cellCol+1 |
-         * --------------------------------------------------------------------
-         * | CellRow  , cellcol-1 | cellrow  , cellCol | cellRow  , cellCol+1 |
-         * --------------------------------------------------------------------
-         * | CellRow+1, cellcol-1 | cellrow+1, cellCol | cellRow+1, cellCol+1 |
-         * --------------------------------------------------------------------
-         */
-        void updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome);
+    int numRows = 0;
+    int numCols = 0;
+    std::vector<Cell> cells;
+    std::vector<BiomeRule> biomeRules;
+    EntropyQueue entropyQueue;
+    std::mt19937 rng;
+    int generationAttempts = 0;
 
-        /**
-         * This needs to be called on every cell
-         */
-        void buildSurroundingCell(int cellRow, int cellCol, Cell* curCell);
+    void initializeCells();
+    void buildRules();
+    void resetToUncollapsed();
+    void resetEntropyQueue();
+    void pushEntropy(int cellIndex, float entropy);
 
+    bool tryCollapseMap();
+    bool propagate(std::queue<int>& pendingCells);
+    bool reduceNeighborOptions(int sourceIndex, int neighborIndex);
+    int findLowestEntropyCell();
+    float computeEntropy(const Cell& cell) const;
+    Biome chooseRandomBiome(const Cell& cell);
 
+    int indexOf(int row, int col) const;
 
-    
-    public:
-        Map(int numOfRows, int numOfCols, std::vector<std::tuple<int,int,char>> userDefinedCells = {});
-        
-        int getNumRows();
-        int getNumCols();
+public:
+    Map(int numOfRows, int numOfCols);
 
-        Cell* getCell(int rowNum, int colNum);
+    int getNumRows() const;
+    int getNumCols() const;
+    int getGenerationAttempts() const;
+    bool isInBounds(int row, int col) const;
 
-        void printMap();
+    Cell& getCell(int rowNum, int colNum);
+    const Cell& getCell(int rowNum, int colNum) const;
+
+    void generate(int maxAttempts = 32);
+    void startGeneration();
+    bool generateStep();
 };
