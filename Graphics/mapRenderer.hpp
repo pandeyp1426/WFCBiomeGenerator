@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include "../BiomeClasses/map.hpp"
 #include "../BiomeClasses/Biome.hpp"
+#include "../BiomeClasses/cell.hpp"
+
 
 class Map;
 class Cell;

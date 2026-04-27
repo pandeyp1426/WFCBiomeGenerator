@@ -1,7 +1,4 @@
 #include "../Graphics/mapRenderer.hpp"
-#include "../BiomeClasses/map.hpp"
-#include "../BiomeClasses/cell.hpp"
-#include "../BiomeClasses/Biome.hpp"
 
 MapRenderer::MapRenderer(int numRows, int numCols, std::vector<std::tuple<int,int,char>> userDefinedCells) : 
 cellMap(numRows, numCols, userDefinedCells){
