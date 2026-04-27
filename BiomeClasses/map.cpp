@@ -18,8 +18,8 @@ namespace
 Map::Map(int numOfRows, int numOfCols)
     : numRows(numOfRows), numCols(numOfCols)
 {
-    std::random_device rd;
-    rng.seed(rd());
+    currentSeed = std::random_device{}();
+    rng.seed(currentSeed);
     initializeCells();
     buildRules();
 }
@@ -68,7 +68,13 @@ void Map::pushEntropy(int cellIndex, float entropy)
 
 void Map::startGeneration()
 {
-    rng.seed(std::random_device{}());
+    startGeneration(std::random_device{}());
+}
+
+void Map::startGeneration(std::uint32_t seed)
+{
+    currentSeed = seed;
+    rng.seed(currentSeed);
     resetToUncollapsed();
     resetEntropyQueue();
 
@@ -236,7 +242,8 @@ void Map::generate(int maxAttempts)
     for (int attempt = 0; attempt < maxAttempts; ++attempt)
     {
         generationAttempts = attempt + 1;
-        rng.seed(std::random_device{}());
+        currentSeed = std::random_device{}();
+        rng.seed(currentSeed);
         resetToUncollapsed();
 
         if (tryCollapseMap())
@@ -257,6 +264,7 @@ bool Map::isInBounds(int row, int col) const
 int Map::getNumRows() const { return numRows; }
 int Map::getNumCols() const { return numCols; }
 int Map::getGenerationAttempts() const { return generationAttempts; }
+std::uint32_t Map::getSeed() const { return currentSeed; }
 
 Cell& Map::getCell(int rowNum, int colNum)
 {

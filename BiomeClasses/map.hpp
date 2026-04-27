@@ -26,6 +26,7 @@ private:
     std::vector<BiomeRule> biomeRules;
     EntropyQueue entropyQueue;
     std::mt19937 rng;
+    std::uint32_t currentSeed = 0;
     int generationAttempts = 0;
 
     void initializeCells();
@@ -49,6 +50,7 @@ public:
     int getNumRows() const;
     int getNumCols() const;
     int getGenerationAttempts() const;
+    std::uint32_t getSeed() const;
     bool isInBounds(int row, int col) const;
 
     Cell& getCell(int rowNum, int colNum);
@@ -56,5 +58,6 @@ public:
 
     void generate(int maxAttempts = 32);
     void startGeneration();
+    void startGeneration(std::uint32_t seed);
     bool generateStep();
 };
