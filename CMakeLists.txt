@@ -16,7 +16,8 @@ add_executable(WFCBiomeGenerator
     src/main.cpp
     BiomeClasses/cell.cpp
     BiomeClasses/map.cpp
-    Graphics/renderer.cpp 
+    Graphics/mapRenderer.cpp
+    Graphics/button.cpp
     BiomeClasses/Biome.cpp)
 target_include_directories(WFCBiomeGenerator PRIVATE
     BiomeClasses
@@ -25,5 +26,12 @@ target_include_directories(WFCBiomeGenerator PRIVATE
 
 target_compile_features(WFCBiomeGenerator PRIVATE cxx_std_17)
 target_link_libraries(WFCBiomeGenerator PRIVATE SFML::Graphics)
+
+add_custom_command(TARGET WFCBiomeGenerator POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:WFCBiomeGenerator>/Fonts
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_CURRENT_SOURCE_DIR}/Graphics/fonts/OpenSans.ttf
+        $<TARGET_FILE_DIR:WFCBiomeGenerator>/Fonts/OpenSans.ttf
+)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT WFCBiomeGenerator)
