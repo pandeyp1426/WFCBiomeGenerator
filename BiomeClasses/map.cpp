@@ -18,8 +18,8 @@ namespace
 Map::Map(int numOfRows, int numOfCols)
     : numRows(numOfRows), numCols(numOfCols)
 {
-    currentSeed = std::random_device{}();
-    rng.seed(currentSeed);
+    std::random_device rd;
+    rng.seed(rd());
     initializeCells();
     buildRules();
 }
@@ -91,7 +91,7 @@ bool Map::generateStep()
 {
     const int nextCellIndex = findLowestEntropyCell();
     if (nextCellIndex < 0)
-        return false;
+        return false; // all cells collapsed, done
 
     Cell& cell = cells[static_cast<std::size_t>(nextCellIndex)];
     cell.collapseTo(chooseRandomBiome(cell));
@@ -100,7 +100,7 @@ bool Map::generateStep()
     propagationQueue.push(nextCellIndex);
     propagate(propagationQueue);
 
-    return true;
+    return true; // still more cells to collapse
 }
 
 bool Map::tryCollapseMap()
