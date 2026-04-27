@@ -68,7 +68,13 @@ void Map::pushEntropy(int cellIndex, float entropy)
 
 void Map::startGeneration()
 {
-    rng.seed(std::random_device{}());
+    startGeneration(std::random_device{}());
+}
+
+void Map::startGeneration(std::uint32_t seed)
+{
+    currentSeed = seed;
+    rng.seed(currentSeed);
     resetToUncollapsed();
     resetEntropyQueue();
 
@@ -130,8 +136,8 @@ bool Map::tryCollapseMap()
 
 bool Map::propagate(std::queue<int>& pendingCells)
 {
-    static constexpr int rowOffsets[4] = { -1, 0,  1,  0 };
-    static constexpr int colOffsets[4] = { 0, 1,  0, -1 };
+    static constexpr int rowOffsets[4] = { -1, 0, 1, 0 };
+    static constexpr int colOffsets[4] = { 0, 1, 0, -1 };
 
     while (!pendingCells.empty())
     {
@@ -166,7 +172,6 @@ bool Map::reduceNeighborOptions(int sourceIndex, int neighborIndex)
     const Cell& sourceCell = cells[static_cast<std::size_t>(sourceIndex)];
     Cell& neighborCell = cells[static_cast<std::size_t>(neighborIndex)];
 
-    // DFA transition: get all biomes allowed next to source's possible biomes
     const std::uint16_t allowedMask =
         BiomeDFA::allowedNeighborMask(sourceCell.getPossibleMask(), biomeRules);
 
@@ -204,6 +209,7 @@ int Map::findLowestEntropyCell()
 
         return index;
     }
+
     return -1;
 }
 
@@ -236,7 +242,8 @@ void Map::generate(int maxAttempts)
     for (int attempt = 0; attempt < maxAttempts; ++attempt)
     {
         generationAttempts = attempt + 1;
-        rng.seed(std::random_device{}());
+        currentSeed = std::random_device{}();
+        rng.seed(currentSeed);
         resetToUncollapsed();
 
         if (tryCollapseMap())
@@ -254,9 +261,10 @@ bool Map::isInBounds(int row, int col) const
     return row >= 0 && row < numRows && col >= 0 && col < numCols;
 }
 
-int  Map::getNumRows()            const { return numRows; }
-int  Map::getNumCols()            const { return numCols; }
-int  Map::getGenerationAttempts() const { return generationAttempts; }
+int Map::getNumRows() const { return numRows; }
+int Map::getNumCols() const { return numCols; }
+int Map::getGenerationAttempts() const { return generationAttempts; }
+std::uint32_t Map::getSeed() const { return currentSeed; }
 
 Cell& Map::getCell(int rowNum, int colNum)
 {
