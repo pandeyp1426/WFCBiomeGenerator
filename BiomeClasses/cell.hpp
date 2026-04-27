@@ -4,7 +4,7 @@
 
 class Cell {
     private:
-        bool isSetByUser = false; // if this is true the cell cant change.
+        bool isSetByUser = false; // if this is true the cell shouldn't change.
         bool isCellSet = false;
 
         std::set<char> currentOptions = {'C', 'D', 'F', 'M', 'O', 'P', 'I', 'S'}; // O = Ocean, C = Coast, P = Plains // true means its available
@@ -24,15 +24,22 @@ class Cell {
         Cell(bool isSetByUser, char biomeOfCell, int cellRow, int cellCol);
         
         bool setBiomeOfCell(char chosenBiome);
+        char getBiomeOfCell(){ return biomeOfCell; }
+
         double getCellEntropy(){ return cellEntropy; }
         void setCellEntropy(double inputEntropy);
+
         std::vector<std::tuple<int, int, Cell*>>& getSurroundCellVect() { return surroundingCells; }
+        
         bool getIsSetByUser(){ return isSetByUser; }
+       
         std::set<char>& getCurrentOptions(){ return currentOptions; }
         void setCurrentOptions(std::set<char> newBiomeOptions){ this->getCurrentOptions() = newBiomeOptions; }
+        
         int getNumberOfRemainingOptions(){ return currentOptions.size(); }
-        char getBiomeOfCell(){ return biomeOfCell; }
+       
         bool getIsCellSet(){ return this->isCellSet; }
         void setIsCellSet(bool isSet){ this->isCellSet = isSet; }
+        
         std::pair<int,int> getCoords(){ return {cellRow, cellCol}; }
 };
