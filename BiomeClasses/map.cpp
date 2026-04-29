@@ -1,131 +1,150 @@
 #include "map.hpp"
 
 /**
- * Called only if the user defines any cells before hand
- * creates user defined cells only if true
- */
-void Map::initializeBoard(bool isUserInput){
-    if(isUserInput){ // creates user defined cells
-        for(std::tuple<int,int,char> curTuple : userDefinedCells){
-            mapVector.at(std::get<0>(curTuple)).at(std::get<1>(curTuple)) = new Cell(true, std::get<2>(curTuple));
-        }
-    }
-
-    for(int row = 0; row < numRows; row++){
-        for(int col = 0; col < numCols; col++){
-            if(mapVector.at(row).at(col)){
-                continue;
-            }
-            else mapVector.at(row).at(col) = new Cell();
-        }
-    }
-}
-
-/**
-         * this function should update the entropy of a single cell, so it would need to be called up to 8 times
-         * when a choice is made. 
-         * --------------------------------------------------------------------
-         * | CellRow-1, cellCol-1 | CellRow-1, cellCol | cellRow-1, cellCol+1 |
-         * --------------------------------------------------------------------
-         * | CellRow  , cellcol-1 | cellrow  , cellCol | cellRow  , cellCol+1 |
-         * --------------------------------------------------------------------
-         * | CellRow+1, cellcol-1 | cellrow+1, cellCol | cellRow+1, cellCol+1 |
-         * --------------------------------------------------------------------
-         */
-
-double Map::cellOptions(int cellRow, int cellCol, Cell) {
-	int amountOfOptions = 0;
-
-    for (int row = cellRow - 1; row <= cellRow + 1; row++) {
-        if (row >= 0 && row < numRows) {
-            for (int col = cellCol - 1; col <= cellCol + 1; col++) {
-                if (col >= 0 && col < numCols) {
-                    if (mapVector.at(row).at(col)->getBiomeOfCell() != NULL) {
-                        continue;
-                    }
-                    else {
-                        char surroundingBiome = mapVector.at(row).at(col)->getBiomeOfCell();
-                        std::vector<char> validOptions = mapRules[surroundingBiome];
-                        for (char option : validOptions) {
-                            if (mapVector.at(cellRow).at(cellCol)->getCurrentOptions(option)) {
-                                amountOfOptions++;
-                            }
-						}
-					}
-                }
-            }
-        }
-    }
-    return amountOfOptions;
-}
-
-double Map::updateCellEntropy(int cellRow, int cellCol, int amountOfOptions) {
-    // will become the total amount of options after checking all surrounding cells
-    int amountOfOptions = mapVector.at(cellRow).at(cellCol)->getNumberOfRemainingOptions();
-    int numSurroundingCells;
-
-    std::unordered_map<char, std::set<char>> mapRules = {
-        {'G', {'G', 'S'}},
-        {'W', {'W', 'S'}},
-        { 'S', {'G', 'W', 'S'}}
-    };
-
-    if (mapVector.at(cellRow).at(cellCol)->getBiomeOfCell() == 'G') {
-		char currentBiome = mapRules.find('G');
-    }
-    else if (mapVector.at(cellRow).at(cellCol)->getBiomeOfCell() == 'W') {
-        char currentBiome = mapRules.find('W');
-    } 
-    else if (mapVector.at(cellRow).at(cellCol)->getBiomeOfCell() == 'S') {
-        char currentBiome = mapRules.find('S');
-    }
-
-    for (int row = cellRow - 1; row <= cellRow + 1; row++) {
-        if (row >= 0 && row < numRows) {
-            for (int col = cellCol - 1; col <= cellCol + 1; col++) {
-                if (col >= 0 && col < numCols) {
-                    if (mapVector.at(row).at(col)->getBiomeOfCell() != NULL) {
-                        continue;
-                    }
-                    else if(currentBiome == 'G') {
-						mapVector.at(cellRow).at(cellCol)->updateOptions('W', false);
-                        amountOfOptions--;
-                    }
-                    else if(currentBiome == 'W') {
-                        mapVector.at(cellRow).at(cellCol)->updateOptions('G', false);
-                        amountOfOptions--;
-                    }
-                    else if(currentBiome == 'S') {
-                        continue;
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-/**
  * Takes in size of the vector
  * userdefined cells is optional
  */
-Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> userDefinedCells = {{-1, -1, '0'}}){
+Map::Map(int numOfRows, int numOfCols, std::vector<std::tuple<int, int, char>> userDefinedCells){
     this->numRows = numOfRows;
     this->numCols = numOfCols;
-    mapVector[numRows][numCols];
-    std::tuple<int, int, char> tempTuple = userDefinedCells.at(0);
-    if(std::get<0>(tempTuple) != -1){ // checking to see if user defined any cells
+    mapVector.resize(numRows, std::vector<Cell*>(numCols, nullptr));
+
+    if(!userDefinedCells.empty()){ // checking to see if user defined any cells
         this->userDefinedCells = userDefinedCells;
         initializeBoard(true);
     }
     else initializeBoard(false);
-
 }
+
+/**
+ * Called only if the user defines any cells before hand
+ * creates user defined cells only if true
+ */
+void Map::initializeBoard(bool isUserInput){
+    if(isUserInput){ // creates user defined cells if true
+        for(std::tuple<int,int,char> curTuple : userDefinedCells){
+            mapVector.at(std::get<0>(curTuple)).at(std::get<1>(curTuple)) = new Cell(true, std::get<2>(curTuple), std::get<0>(curTuple), std::get<1>(curTuple));
+        }
+    }
+
+    for(int row = 0; row < numRows; row++){ // builds the rest of the cells with default constructro
+        for(int col = 0; col < numCols; col++){
+            if(mapVector.at(row).at(col)){
+                continue;
+            }
+            else mapVector.at(row).at(col) = new Cell(row, col);
+        }
+    }
+
+    for(int row = 0; row < numRows; row++){ // goes through board again after all cells are created buildingSurroundingCellsVect
+        for(int col = 0; col < numCols; col++){
+            buildSurroundingCell(row, col, getCell(row, col));
+        }
+    }
+}
+
+/**
+ * this function should update the entropy of current cells entropy and choices
+*/
+double Map::updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome){
+    double entropy = 6.0; //6 because there are 6 options
+    Cell* curCell = getCell(cellRow, cellCol);
+    curCell->setBiomeOfCell(chosenBiome);
+    for (std::tuple<int, int, Cell*> surroundingCell : curCell->getSurroundCellVect()){
+        int surroundRow = std::get<0>(surroundingCell); 
+        int surroundCol = std::get<1>(surroundingCell);
+        Cell* surroundCell = std::get<2>(surroundingCell);
+            for(char option : biomeRules.at(chosenBiome)){
+                if(surroundCell->getCurrentOptions(option)){   
+                    surroundCell->updateOptions(option, false); // false because this indicates it can't be chosen again and we are choosing it here   
+                    entropy -= updateCellEntropy(surroundRow, surroundCol);
+                }
+                continue;
+            }
+    }
+
+    return entropy;
+}
+
+/**
+ * this function builds the Cell*'s surrounding cells vector, that way when we update a cells entropy and biome choice
+ * we can easily update its surrounding cells by just iterating through the cells surroundingCells Vector.
+ * --------------------------------------------------------------------
+ * | cellRow-1, cellCol-1 | cellRow-1, cellCol | cellRow-1, cellCol+1 |
+ * --------------------------------------------------------------------
+ * | CellRow  , cellcol-1 | cellrow  , cellCol | cellRow  , cellCol+1 |
+ * --------------------------------------------------------------------
+ * | CellRow+1, cellcol-1 | cellrow+1, cellCol | cellRow+1, cellCol+1 |
+ * --------------------------------------------------------------------
+ */
+
+ /*
+void Map::buildSurroundingCell(int cellRow, int cellCol, Cell* curCell){
+    if(cellRow != 0 && cellRow != numRows - 1 && cellCol != 0 && cellCol != cellCol - 1){ // Cell is not an edge or corner
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
+    }
+    else if(cellRow == 0){ // cell is on the top edge
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
+        if(cellCol == 0){ // top left corner
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
+        }
+        else if(cellCol == numCols - 1){ // top right corner
+            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+        }
+        else{ // cell is not top left or right corner
+            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell
+            curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+        }
+    }
+    else if(cellRow == numRows - 1){ // cell is on the bottom edge
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
+        if(cellCol == 0){ // Bottom left corner
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
+        }
+        else if(cellCol == numCols-1){ // Bottom Right Corner
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
+        }
+        else{ // cell is not bottom left or right corner
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
+            curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+            curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell   
+        }
+    }
+    else if(cellCol == 0 && cellRow != 0 && cellRow != numRows - 1){ // Just Left Edge
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol+1, getCell(cellRow-1, cellCol+1)}); // Top Right Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol+1, getCell(cellRow+1, cellCol+1)}); // Bottom Right Cell 
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol+1, getCell(cellRow, cellCol+1)}); // Middle Right Cell
+    }
+    else if(cellCol == numCols - 1 && cellRow != 0 && cellRow != numRows - 1){ // Just Right Edge
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol, getCell(cellRow-1, cellCol)}); // Top Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol)}); // Bottom Middle Cell
+        curCell->getSurroundCellVect().push_back({cellRow, cellCol, getCell(cellRow, cellCol)}); // Middle Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow-1, cellCol-1, getCell(cellRow-1, cellCol-1)}); // Top Left Cell
+        curCell->getSurroundCellVect().push_back({cellRow+1, cellCol-1, getCell(cellRow+1, cellCol-1)}); // Bottom Left Cell
+    }
+} */
 
 int Map::getNumRows(){ return numRows; }
 int Map::getNumCols(){ return numCols; }
 
 Cell* Map::getCell(int rowNum, int colNum){ return mapVector.at(rowNum).at(colNum); }
+
 
 /**
  * Temporary print to cmd line to test

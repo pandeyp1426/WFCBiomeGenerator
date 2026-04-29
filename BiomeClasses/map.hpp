@@ -2,7 +2,7 @@
 #include <tuple>
 #include <iostream>
 #include <set>
-#include "cell.hpp";
+#include "cell.hpp"
 
 class Map{
     private:
@@ -15,6 +15,8 @@ class Map{
          * creates user defined cells only if true
          */
         void initializeBoard(bool isUserInput);
+
+        double updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome);
 
         std::unordered_map<char, std::set<char>> biomeRules = {
             {'C', {'C', 'D', 'O', 'P'}}, // Coast can be next to Coast/Desert/Ocean/Plains
