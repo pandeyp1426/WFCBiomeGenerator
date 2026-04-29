@@ -16,7 +16,7 @@ class Map{
          */
         void initializeBoard(bool isUserInput);
 
-        double updateCellEntropyChoice(int cellRow, int cellCol, char chosenBiome);
+        double updateCellEntropyChoice(int cellRow, int cellCol);
 
         std::unordered_map<char, std::set<char>> biomeRules = {
             {'C', {'C', 'D', 'O', 'P'}}, // Coast can be next to Coast/Desert/Ocean/Plains
@@ -44,7 +44,9 @@ class Map{
     
     public:
         Map(int numOfRows, int numOfCols, std::vector<std::tuple<int,int,char>> userDefinedCells = {{-1, -1, '0'}});
-        
+
+        void buildSurroundingCell(int cellRow, int cellCol, Cell *curCell);
+
         int getNumRows();
         int getNumCols();
 
