@@ -45,13 +45,6 @@ void Cell::collapseTo(Biome biome)
     cachedEntropy = 0.0f;
 }
 
-bool  Cell::isCollapsed() const { return collapsed; }
-int   Cell::getRow()      const { return cellRow; }
-int   Cell::getCol()      const { return cellCol; }
-Biome Cell::getBiome()    const { return collapsedBiome; }
-
-std::uint16_t Cell::getPossibleMask() const { return possibleMask; }
-
 void Cell::setPossibleMask(std::uint16_t newMask)
 {
     possibleMask = newMask;
@@ -66,13 +59,7 @@ bool Cell::hasOption(Biome biome) const
     return (possibleMask & biomeMask(biome)) != 0;
 }
 
-int Cell::getNumberOfRemainingOptions() const
-{
-    return countBits(possibleMask);
-}
-
 void  Cell::setCellEntropy(float entropy) { cachedEntropy = entropy; }
-float Cell::getCellEntropy()        const { return cachedEntropy; }
 
 std::uint16_t biomeMask(Biome biome)
 {
