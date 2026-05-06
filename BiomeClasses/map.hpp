@@ -42,19 +42,19 @@ private:
     float computeEntropy(const Cell& cell) const;
     Biome chooseRandomBiome(const Cell& cell);
 
-    int indexOf(int row, int col) const;
+    int indexOf(int row, int col) const { return row * numCols + col; }
 
 public:
     Map(int numOfRows, int numOfCols);
 
-    int getNumRows() const;
-    int getNumCols() const;
-    int getGenerationAttempts() const;
-    std::uint32_t getSeed() const;
-    bool isInBounds(int row, int col) const;
+    int getNumRows() const { return numRows; }
+    int getNumCols() const { return numCols; }
+    int getGenerationAttempts() const { return generationAttempts; }
+    std::uint32_t getSeed() const { return currentSeed; }
+    bool isInBounds(int row, int col) const { return row >= 0 && row < numRows && col >= 0 && col < numCols; }
 
-    Cell& getCell(int rowNum, int colNum);
-    const Cell& getCell(int rowNum, int colNum) const;
+    Cell& getCell(int rowNum, int colNum) { return cells.at(static_cast<std::size_t>(indexOf(rowNum, colNum))); }
+    const Cell& getCell(int rowNum, int colNum) const { return cells.at(static_cast<std::size_t>(indexOf(rowNum, colNum))); }
 
     void generate(int maxAttempts = 32);
     void startGeneration();
