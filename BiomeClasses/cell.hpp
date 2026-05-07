@@ -34,17 +34,18 @@ public:
     void reset(std::uint16_t fullMask);
     void collapseTo(Biome biome);
 
-    bool isCollapsed() const;
-    int getRow() const;
-    int getCol() const;
-    Biome getBiome() const;
-    std::uint16_t getPossibleMask() const;
     void setPossibleMask(std::uint16_t newMask);
     bool hasOption(Biome biome) const;
-    int getNumberOfRemainingOptions() const;
+    int getNumberOfRemainingOptions() const { return countBits(possibleMask); }
 
     void setCellEntropy(float entropy);
-    float getCellEntropy() const;
+    float getCellEntropy() const { return cachedEntropy; }
+
+    bool  isCollapsed() const { return collapsed; }
+    int   getRow() const { return cellRow; }
+    int   getCol() const { return cellCol; }
+    Biome getBiome() const { return collapsedBiome; }
+    std::uint16_t getPossibleMask() const { return possibleMask; }
 };
 
 constexpr int biomeCount()

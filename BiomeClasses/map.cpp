@@ -250,28 +250,3 @@ void Map::generate(int maxAttempts)
             return;
     }
 }
-
-int Map::indexOf(int row, int col) const
-{
-    return row * numCols + col;
-}
-
-bool Map::isInBounds(int row, int col) const
-{
-    return row >= 0 && row < numRows && col >= 0 && col < numCols;
-}
-
-int Map::getNumRows() const { return numRows; }
-int Map::getNumCols() const { return numCols; }
-int Map::getGenerationAttempts() const { return generationAttempts; }
-std::uint32_t Map::getSeed() const { return currentSeed; }
-
-Cell& Map::getCell(int rowNum, int colNum)
-{
-    return cells.at(static_cast<std::size_t>(indexOf(rowNum, colNum)));
-}
-
-const Cell& Map::getCell(int rowNum, int colNum) const
-{
-    return cells.at(static_cast<std::size_t>(indexOf(rowNum, colNum)));
-}

@@ -132,6 +132,10 @@ int main()
                 window.close();
                 break;
             case sf::Keyboard::Key::Space:
+                currentSeed = std::random_device{}();
+                updateSidebarText();
+                restart();
+                break;
             case sf::Keyboard::Key::R:
                 restart();
                 break;
