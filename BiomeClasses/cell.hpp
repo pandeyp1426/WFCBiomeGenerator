@@ -36,7 +36,7 @@ public:
 
     void setPossibleMask(std::uint16_t newMask);
     bool hasOption(Biome biome) const;
-    int getNumberOfRemainingOptions() const { return countBits(possibleMask); }
+    int getNumberOfRemainingOptions() const;
 
     void setCellEntropy(float entropy);
     float getCellEntropy() const { return cachedEntropy; }

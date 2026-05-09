@@ -59,6 +59,11 @@ bool Cell::hasOption(Biome biome) const
     return (possibleMask & biomeMask(biome)) != 0;
 }
 
+int Cell::getNumberOfRemainingOptions() const
+{
+    return countBits(possibleMask);
+}
+
 void  Cell::setCellEntropy(float entropy) { cachedEntropy = entropy; }
 
 std::uint16_t biomeMask(Biome biome)
