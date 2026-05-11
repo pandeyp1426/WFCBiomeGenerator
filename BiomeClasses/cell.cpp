@@ -65,3 +65,7 @@ std::uint16_t biomeMask(Biome biome)
 {
     return static_cast<std::uint16_t>(1u << static_cast<int>(biome));
 }
+
+int Cell::getNumberOfRemainingOptions() const {
+    return countBits(possibleMask);
+}
